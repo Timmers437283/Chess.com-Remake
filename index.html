@@ -5,747 +5,764 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Chess</title>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg: rgb(48,46,43);
-  --dark: rgb(118,149,86);
-  --light: #eaedd1;
-  --panel: #262421;
-  --panel2: #302e2b;
-  --text: #eee;
-  --muted: #aaa69f;
-  --green: #81b64c;
-  --red: #e05252;
+  --bg:rgb(48,46,43);
+  --dark:rgb(118,149,86);
+  --light:#eaedd1;
+  --panel:#262421;
+  --text:#eee;
+  --muted:#aaa69f;
+  --green:#81b64c;
+  --red:#e05252;
 }
 
-* {
-  box-sizing: border-box;
-}
+* {box-sizing:border-box}
 
 body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Google Sans',Arial,sans-serif;
-  min-height: 100vh;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Google Sans',Arial,sans-serif;
+  overflow:hidden;
 }
 
-button {
-  font-family: inherit;
-}
+button {font-family:inherit;cursor:pointer}
 
-/* GENERAL */
+/* SCREEN TRANSITIONS */
 
 .screen {
-  display: none;
-  min-height: 100vh;
+  position:fixed;
+  inset:0;
+  display:none;
+  overflow-y:auto;
+  overflow-x:hidden;
+  background:var(--bg);
+  z-index:1;
 }
 
-.screen.active {
-  display: block;
+.screen.active {display:block}
+
+#boot.active {
+  display:flex;
+  flex-direction:column;
 }
 
-button {
-  cursor: pointer;
+.screen-content {
+  min-height:100%;
+  padding-top:65px;
 }
-
-/* BOOT SCREEN */
-
-#boot {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  padding: 28px 38px;
-}
-
-.boot-logo {
-  width: 150px;
-  max-height: 65px;
-  object-fit: contain;
-  object-position: left center;
-}
-
-.boot-content {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  text-align: center;
-  gap: 20px;
-}
-
-.boot-board {
-  width: min(280px,65vw);
-  aspect-ratio: 1;
-  display: grid;
-  grid-template-columns: repeat(8,1fr);
-  overflow: hidden;
-  border-radius: 3px;
-}
-
-.boot-square:nth-child(16n+1),
-.boot-square:nth-child(16n+3),
-.boot-square:nth-child(16n+5),
-.boot-square:nth-child(16n+7),
-.boot-square:nth-child(16n+10),
-.boot-square:nth-child(16n+12),
-.boot-square:nth-child(16n+14),
-.boot-square:nth-child(16n+16) {
-  background: var(--dark);
-}
-
-.boot-square {
-  background: var(--light);
-}
-
-.boot-content h1 {
-  font-size: clamp(32px,5vw,48px);
-  margin: 0;
-  font-weight: 700;
-  letter-spacing: -1.5px;
-}
-
-.boot-content p {
-  color: var(--muted);
-  margin: 0;
-  font-size: 15px;
-}
-
-.get-started {
-  width: 230px;
-  height: 55px;
-  border: none;
-  border-radius: 5px;
-  background: var(--green);
-  color: white;
-  font-size: 17px;
-  font-weight: 700;
-  transition: background .2s,transform .2s;
-}
-
-.get-started:hover {
-  background: #91c75a;
-  transform: translateY(-2px);
-}
-
-/* HEADER */
 
 header {
-  height: 65px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 30px;
-  background: #262421;
-  border-bottom: 1px solid #3b3935;
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:65px;
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 30px;
+  background:#262421;
+  border-bottom:1px solid #3b3935;
+  z-index:20;
 }
 
 .header-left {
-  display: flex;
-  align-items: center;
-  gap: 18px;
+  display:flex;
+  align-items:center;
+  gap:18px;
 }
 
 .header-logo {
-  width: 115px;
-  max-height: 45px;
-  object-fit: contain;
-}
-
-.header-logo-fallback {
-  font-size: 22px;
-  font-weight: 700;
-  display: none;
+  width:115px;
+  max-height:43px;
+  object-fit:contain;
 }
 
 .header-back {
-  background: none;
-  border: none;
-  color: #aaa;
-  font-size: 14px;
-  font-weight: 600;
+  background:none;
+  border:none;
+  color:#aaa;
+  font-size:14px;
+  font-weight:600;
 }
 
-.header-back:hover {
-  color: white;
+.header-back:hover {color:white}
+
+/* LANDING */
+
+.landing-top {
+  padding:24px 35px;
+  height:90px;
+  display:flex;
+  align-items:center;
+}
+
+.landing-logo {
+  width:145px;
+  max-height:55px;
+  object-fit:contain;
+}
+
+.landing-content {
+  width:min(1120px,92%);
+  margin:auto;
+  flex:1;
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  align-items:center;
+  gap:65px;
+  padding-bottom:65px;
+}
+
+.hero-video {
+  width:100%;
+  aspect-ratio:1.12/1;
+  object-fit:cover;
+  border-radius:5px;
+  background:#25231f;
+}
+
+.landing-text {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+}
+
+.landing-text h1 {
+  font-size:clamp(34px,4.3vw,53px);
+  line-height:1.12;
+  letter-spacing:-1.7px;
+  margin:0 0 18px;
+  font-weight:700;
+}
+
+.landing-text p {
+  font-size:17px;
+  line-height:1.6;
+  color:#c3beb5;
+  margin:0 0 30px;
+  max-width:420px;
+}
+
+.get-started {
+  width:100%;
+  max-width:350px;
+  height:58px;
+  background:var(--green);
+  color:white;
+  border:none;
+  border-radius:5px;
+  font-size:18px;
+  font-weight:700;
+  transition:background .15s,transform .15s;
+}
+
+.get-started:hover {
+  background:#91c75a;
+  transform:translateY(-2px);
 }
 
 /* HOME */
 
 .home-layout {
-  max-width: 1100px;
-  width: 94%;
-  margin: 55px auto;
-  display: grid;
-  grid-template-columns: minmax(0,600px) minmax(250px,350px);
-  align-items: center;
-  gap: 55px;
-}
-
-.home-board-wrap {
-  width: 100%;
-  max-width: 580px;
+  max-width:1100px;
+  width:94%;
+  margin:45px auto;
+  display:grid;
+  grid-template-columns:minmax(0,600px) minmax(250px,350px);
+  align-items:center;
+  gap:55px;
 }
 
 .home-board {
-  width: 100%;
-  aspect-ratio: 1;
-  display: grid;
-  grid-template-columns: repeat(8,1fr);
-  overflow: hidden;
-  border-radius: 3px;
-  pointer-events: none;
-}
-
-.home-board img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width:100%;
+  aspect-ratio:1;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  overflow:hidden;
 }
 
 .home-square {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-.home-square.light { background: var(--light); }
-.home-square.dark { background: var(--dark); }
+.home-square.light {background:var(--light)}
+.home-square.dark {background:var(--dark)}
+
+.home-square img {
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  pointer-events:none;
+}
 
 .home-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
+  display:flex;
+  flex-direction:column;
+  gap:13px;
 }
 
 .home-title {
-  font-size: 34px;
-  font-weight: 700;
-  letter-spacing: -1px;
-  margin: 0 0 5px;
+  font-size:34px;
+  font-weight:700;
+  letter-spacing:-1px;
+  margin:0 0 5px;
 }
 
 .home-subtitle {
-  color: var(--muted);
-  margin: 0 0 20px;
-  font-size: 14px;
+  color:var(--muted);
+  margin:0 0 20px;
+  font-size:14px;
 }
 
 .menu-button {
-  width: 100%;
-  height: 65px;
-  border: 1px solid #45413b;
-  border-radius: 5px;
-  background: #262421;
-  color: white;
-  display: flex;
-  align-items: center;
-  padding: 0 17px;
-  gap: 15px;
-  text-align: left;
-  transition: background .15s,border .15s;
+  width:100%;
+  height:65px;
+  border:1px solid #45413b;
+  border-radius:5px;
+  background:#262421;
+  color:white;
+  display:flex;
+  align-items:center;
+  padding:0 17px;
+  gap:15px;
+  text-align:left;
+  transition:background .15s,border .15s;
 }
 
 .menu-button:hover {
-  background: #37342f;
-  border-color: #69645b;
+  background:#37342f;
+  border-color:#69645b;
 }
 
 .menu-icon {
-  font-size: 25px;
-  width: 32px;
-  text-align: center;
+  font-size:25px;
+  width:32px;
+  text-align:center;
 }
 
 .menu-label {
-  font-size: 16px;
-  font-weight: 700;
+  font-size:16px;
+  font-weight:700;
 }
 
 .menu-description {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 3px;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:3px;
 }
 
 /* BOTS */
 
 .page-container {
-  max-width: 1050px;
-  width: 94%;
-  margin: 45px auto;
+  max-width:1100px;
+  width:94%;
+  margin:40px auto;
 }
 
 .page-title {
-  font-size: 30px;
-  margin: 0;
-  letter-spacing: -.8px;
+  font-size:30px;
+  margin:0;
+  letter-spacing:-.8px;
 }
 
 .page-subtitle {
-  color: var(--muted);
-  margin: 9px 0 28px;
-  font-size: 14px;
+  color:var(--muted);
+  margin:9px 0 28px;
+  font-size:14px;
 }
 
 .bot-grid {
-  display: grid;
-  grid-template-columns: repeat(3,minmax(0,1fr));
-  gap: 13px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:13px;
 }
 
 .bot-card {
-  background: #262421;
-  border: 1px solid #3d3933;
-  border-radius: 6px;
-  padding: 17px;
-  min-height: 155px;
-  cursor: pointer;
-  transition: background .15s,border .15s;
+  background:#262421;
+  border:1px solid #3d3933;
+  border-radius:6px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:background .15s,border .15s;
 }
 
 .bot-card:hover {
-  background: #35322d;
-  border-color: #81b64c;
+  background:#35322d;
+  border-color:#777066;
 }
 
 .bot-card.selected {
-  border: 2px solid var(--green);
-  background: #34392c;
-  padding: 16px;
+  border:2px solid var(--green);
+  background:#34392c;
 }
 
-.bot-top {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.bot-cover {
+  width:100%;
+  aspect-ratio:2.1/1;
+  background:#39362f;
+  position:relative;
+  overflow:hidden;
 }
 
-.bot-avatar {
-  width: 45px;
-  height: 45px;
-  background: #413e37;
-  border-radius: 6px;
-  display: grid;
-  place-items: center;
-  font-size: 27px;
+.bot-cover img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.bot-cover-fallback {
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+  font-size:45px;
+  background:#37342e;
+}
+
+.bot-details {
+  padding:14px;
 }
 
 .bot-name {
-  font-weight: 700;
-  font-size: 15px;
+  font-weight:700;
+  font-size:16px;
 }
 
 .bot-elo {
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: 3px;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
 }
 
 .bot-description {
-  font-size: 12px;
-  color: #b9b4aa;
-  margin-top: 15px;
-  line-height: 1.5;
+  font-size:12px;
+  color:#b9b4aa;
+  margin-top:12px;
+  line-height:1.5;
 }
 
 .bot-quote {
-  color: #a8c982;
-  font-size: 12px;
-  margin-top: 8px;
+  color:#a8c982;
+  font-size:12px;
+  margin-top:9px;
 }
 
 .bot-bottom {
-  margin-top: 25px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  margin-top:25px;
+  display:flex;
+  align-items:center;
+  gap:12px;
 }
 
 .start-bot {
-  height: 48px;
-  background: var(--green);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 15px;
-  font-weight: 700;
-  padding: 0 28px;
+  height:48px;
+  background:var(--green);
+  color:white;
+  border:none;
+  border-radius:5px;
+  font-size:15px;
+  font-weight:700;
+  padding:0 28px;
 }
 
-.start-bot:hover {
-  background: #91c75a;
+.start-bot:disabled {
+  opacity:.4;
+  cursor:default;
+}
+
+.start-bot:not(:disabled):hover {
+  background:#91c75a;
 }
 
 /* GAME */
 
 .game-layout {
-  width: min(1100px,95%);
-  margin: 30px auto;
-  display: grid;
-  grid-template-columns: minmax(0,650px) minmax(250px,330px);
-  gap: 25px;
-  align-items: start;
+  width:min(1100px,95%);
+  margin:30px auto;
+  display:grid;
+  grid-template-columns:minmax(0,650px) minmax(250px,330px);
+  gap:25px;
+  align-items:start;
 }
 
-.board-area {
-  width: 100%;
-}
+.board-area {width:100%}
 
 .player {
-  height: 49px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 600;
+  height:49px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:14px;
+  font-weight:600;
 }
 
 .avatar {
-  width: 31px;
-  height: 31px;
-  background: #44413b;
-  border-radius: 5px;
-  display: grid;
-  place-items: center;
-  font-size: 19px;
+  width:31px;
+  height:31px;
+  background:#44413b;
+  border-radius:5px;
+  display:grid;
+  place-items:center;
+  font-size:19px;
+  overflow:hidden;
+}
+
+.avatar img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
 }
 
 .board {
-  width: 100%;
-  aspect-ratio: 1;
-  display: grid;
-  grid-template-columns: repeat(8,1fr);
-  grid-template-rows: repeat(8,1fr);
-  overflow: hidden;
-  user-select: none;
+  width:100%;
+  aspect-ratio:1;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(8,1fr);
+  overflow:hidden;
+  user-select:none;
 }
 
 .square {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
 }
 
-.square.light { background: var(--light); }
-.square.dark { background: var(--dark); }
+.square.light {background:var(--light)}
+.square.dark {background:var(--dark)}
 
 .square.selected {
-  background-image: linear-gradient(rgba(255,220,0,.48),rgba(255,220,0,.48));
+  background-image:linear-gradient(rgba(255,220,0,.48),rgba(255,220,0,.48));
 }
 
 .square.last {
-  background-image: linear-gradient(rgba(255,220,0,.23),rgba(255,220,0,.23));
+  background-image:linear-gradient(rgba(255,220,0,.23),rgba(255,220,0,.23));
 }
 
 .square img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none;
-  z-index: 1;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  pointer-events:none;
+  z-index:1;
 }
 
 .square .dot {
-  position: absolute;
-  width: 25%;
-  height: 25%;
-  border-radius: 50%;
-  background: rgba(30,40,20,.28);
+  position:absolute;
+  width:25%;
+  height:25%;
+  border-radius:50%;
+  background:rgba(30,40,20,.28);
 }
 
 .square .capture {
-  position: absolute;
-  inset: 0;
-  border: 6px solid rgba(30,40,20,.25);
-  border-radius: 50%;
+  position:absolute;
+  inset:0;
+  border:6px solid rgba(30,40,20,.25);
+  border-radius:50%;
 }
 
 .coordinates {
-  position: absolute;
-  font-size: 11px;
-  font-weight: 700;
-  z-index: 2;
-  pointer-events: none;
+  position:absolute;
+  font-size:11px;
+  font-weight:700;
+  z-index:2;
+  pointer-events:none;
 }
 
-.rank { top: 3px; left: 4px; }
-.file { bottom: 3px; right: 4px; }
+.rank {top:3px;left:4px}
+.file {bottom:3px;right:4px}
 
-.light .coordinates { color: var(--dark); }
-.dark .coordinates { color: var(--light); }
+.light .coordinates {color:var(--dark)}
+.dark .coordinates {color:var(--light)}
 
 .sidebar {
-  background: var(--panel);
-  border-radius: 5px;
-  overflow: hidden;
+  background:var(--panel);
+  border-radius:5px;
+  overflow:hidden;
 }
 
 .sidebar-heading {
-  padding: 17px;
-  border-bottom: 1px solid #3b3935;
-  font-weight: 700;
-  font-size: 15px;
+  padding:17px;
+  border-bottom:1px solid #3b3935;
+  font-weight:700;
+  font-size:15px;
 }
 
-.game-info {
-  padding: 17px;
-}
+.game-info {padding:17px}
 
 .status {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 14px;
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:14px;
 }
 
 .bot-message {
-  padding: 12px;
-  background: #34312c;
-  border-radius: 5px;
-  margin-bottom: 15px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #ddd8cf;
-  min-height: 52px;
+  padding:12px;
+  background:#34312c;
+  border-radius:5px;
+  margin-bottom:15px;
+  font-size:13px;
+  line-height:1.5;
+  color:#ddd8cf;
+  min-height:52px;
 }
 
 .moves {
-  background: #201f1c;
-  border-radius: 4px;
-  min-height: 150px;
-  max-height: 270px;
-  overflow-y: auto;
-  padding: 8px;
+  background:#201f1c;
+  border-radius:4px;
+  min-height:150px;
+  max-height:270px;
+  overflow-y:auto;
+  padding:8px;
 }
 
 .move-row {
-  display: grid;
-  grid-template-columns: 35px 1fr 1fr;
-  padding: 9px 6px;
-  border-radius: 3px;
-  font-size: 14px;
+  display:grid;
+  grid-template-columns:35px 1fr 1fr;
+  padding:9px 6px;
+  border-radius:3px;
+  font-size:14px;
 }
 
-.move-row:nth-child(even) {
-  background: #292722;
-}
-
-.move-number { color: #99948c; }
-.move { font-weight: 500; }
+.move-row:nth-child(even) {background:#292722}
+.move-number {color:#99948c}
+.move {font-weight:500}
 
 .controls {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 8px;
-  margin-top: 14px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:14px;
 }
 
 .controls button {
-  height: 42px;
-  border: none;
-  border-radius: 4px;
-  background: #45423c;
-  color: white;
-  font-size: 13px;
-  font-weight: 600;
+  height:42px;
+  border:none;
+  border-radius:4px;
+  background:#45423c;
+  color:white;
+  font-size:13px;
+  font-weight:600;
 }
 
-.controls button:hover { background: #57534b; }
-
-.controls button:disabled {
-  opacity: .35;
-  cursor: default;
-}
+.controls button:hover {background:#57534b}
+.controls button:disabled {opacity:.35;cursor:default}
 
 .action-button {
-  width: 100%;
-  height: 44px;
-  margin-top: 10px;
-  background: var(--green);
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-size: 14px;
-  font-weight: 700;
+  width:100%;
+  height:44px;
+  margin-top:10px;
+  background:var(--green);
+  border:none;
+  border-radius:4px;
+  color:white;
+  font-size:14px;
+  font-weight:700;
 }
 
-.action-button:hover { background: #91c75a; }
+.action-button:hover {background:#91c75a}
 
 /* PROMOTION */
 
 .promotion {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.7);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:30;
 }
 
 .promotion-box {
-  background: #292722;
-  padding: 20px;
-  border-radius: 6px;
-  display: flex;
-  gap: 8px;
+  background:#292722;
+  padding:20px;
+  border-radius:6px;
+  display:flex;
+  gap:8px;
 }
 
 .promotion-box button {
-  background: #44413b;
-  border: 0;
-  border-radius: 5px;
-  width: 65px;
-  height: 65px;
+  background:#44413b;
+  border:0;
+  border-radius:5px;
+  width:65px;
+  height:65px;
 }
 
-.promotion-box button:hover { background: #5b574e; }
+.promotion-box button:hover {background:#5b574e}
+.promotion-box img {width:100%}
 
-.promotion-box img {
-  width: 100%;
-}
-
-/* TOAST */
+/* ONLINE ERROR */
 
 .toast {
-  position: fixed;
-  top: 85px;
-  left: 50%;
-  transform: translate(-50%,-15px);
-  opacity: 0;
-  pointer-events: none;
-  background: #a93636;
-  color: white;
-  padding: 14px 20px;
-  border-radius: 5px;
-  font-size: 14px;
-  font-weight: 600;
-  z-index: 30;
-  transition: opacity .2s,transform .2s;
-  text-align: center;
-  width: max-content;
-  max-width: 90%;
+  position:fixed;
+  top:85px;
+  left:50%;
+  transform:translate(-50%,-15px);
+  opacity:0;
+  pointer-events:none;
+  background:#a93636;
+  color:white;
+  padding:14px 20px;
+  border-radius:5px;
+  font-size:14px;
+  font-weight:600;
+  z-index:40;
+  transition:opacity .2s,transform .2s;
+  text-align:center;
+  width:max-content;
+  max-width:90%;
 }
 
 .toast.show {
-  opacity: 1;
-  transform: translate(-50%,0);
+  opacity:1;
+  transform:translate(-50%,0);
 }
 
 /* RESPONSIVE */
 
 @media(max-width:850px) {
-  .home-layout {
-    grid-template-columns: minmax(0,1fr);
-    max-width: 550px;
-    margin: 25px auto;
-    gap: 25px;
+  .landing-content {
+    grid-template-columns:1fr;
+    max-width:550px;
+    gap:30px;
+    padding-bottom:35px;
   }
 
-  .home-menu { width: 100%; }
-  .home-title { font-size: 27px; }
+  .hero-video {
+    aspect-ratio:16/9;
+  }
+
+  .landing-text h1 {font-size:38px}
+
+  .home-layout {
+    grid-template-columns:minmax(0,1fr);
+    max-width:550px;
+    margin:25px auto;
+    gap:25px;
+  }
 
   .game-layout {
-    display: flex;
-    flex-direction: column;
-    max-width: 620px;
-    margin: 15px auto;
+    display:flex;
+    flex-direction:column;
+    max-width:620px;
+    margin:15px auto;
   }
 
-  .sidebar { width: 100%; }
+  .sidebar {width:100%}
 }
 
 @media(max-width:650px) {
-  header { padding: 0 15px; }
-  #boot { padding: 20px; }
-  .page-container { margin: 25px auto; }
-  .bot-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .page-title { font-size: 26px; }
-  .game-layout { width: 100%; }
-  .board-area { padding: 0 7px; }
-  .player { padding: 0 7px; }
-  .sidebar { border-radius: 0; }
+  header {padding:0 15px}
+  .landing-top {padding:18px 20px;height:75px}
+  .landing-logo {width:120px}
+  .landing-content {width:90%;gap:25px}
+  .landing-text h1 {font-size:34px}
+  .landing-text p {font-size:15px}
+  .page-container {margin:25px auto}
+  .bot-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .page-title {font-size:26px}
+  .game-layout {width:100%}
+  .board-area {padding:0 7px}
+  .player {padding:0 7px}
+  .sidebar {border-radius:0}
 }
 
 @media(max-width:390px) {
-  .bot-grid { grid-template-columns: 1fr; }
+  .bot-grid {grid-template-columns:1fr}
 }
 </style>
 </head>
 
 <body>
 
-<!-- BOOT SCREEN -->
-
-<section id="boot" class="screen active">
-  <img src="Resources/logo.svg" class="boot-logo" alt="Logo"
-       onerror="this.style.display='none';document.getElementById('bootFallback').style.display='block'">
-
-  <div id="bootFallback" class="header-logo-fallback" style="display:none">Chess</div>
-
-  <div class="boot-content">
-    <div class="boot-board" id="bootBoard"></div>
-    <h1>Chess.</h1>
-    <p>A better place to play chess.</p>
-    <button class="get-started" onclick="showScreen('home')">Get Started</button>
-  </div>
-</section>
-
-<!-- HEADER -->
-
-<header id="header" style="display:none">
+<header id="header">
   <div class="header-left">
     <button class="header-back" onclick="goBack()">← Back</button>
-    <img src="Resources/logo.svg" class="header-logo" alt="Chess"
-         onerror="this.style.display='none';document.getElementById('headerFallback').style.display='block'">
-    <span class="header-logo-fallback" id="headerFallback">Chess</span>
+    <img src="Resources/logo.svg" class="header-logo" alt="Chess">
   </div>
 </header>
 
-<!-- HOME -->
+<!-- LANDING SCREEN -->
 
-<section id="home" class="screen">
-  <div class="home-layout">
+<section id="boot" class="screen active">
 
-    <div class="home-board-wrap">
-      <div class="home-board" id="homeBoard"></div>
+  <div class="landing-top">
+    <img src="Resources/logo.svg" class="landing-logo" alt="Chess">
+  </div>
+
+  <div class="landing-content">
+
+    <video class="hero-video"
+      src="https://assets-configurator.chess.com/video/configurator/hero_1780586045036.webm"
+      autoplay muted loop playsinline preload="auto">
+    </video>
+
+    <div class="landing-text">
+      <h1>Play Chess Online on the #1 Site!</h1>
+
+      <p><strong>Join 250+ million players in the world's largest chess community</strong></p>
+
+      <button class="get-started" onclick="showScreen('home')">
+        Get Started
+      </button>
     </div>
 
-    <div class="home-menu">
-      <h1 class="home-title">Play Chess</h1>
-      <p class="home-subtitle">Choose how you want to play.</p>
+  </div>
+</section>
 
-      <button class="menu-button" onclick="showScreen('bots')">
-        <span class="menu-icon">♟</span>
-        <span>
-          <div class="menu-label">Play Bots</div>
-          <div class="menu-description">Play against computer opponents</div>
-        </span>
-      </button>
+<!-- HOME SCREEN -->
 
-      <button class="menu-button" onclick="onlineUnavailable()">
-        <span class="menu-icon">♟</span>
-        <span>
-          <div class="menu-label">Play Online</div>
-          <div class="menu-description">Challenge other players</div>
-        </span>
-      </button>
+<section id="home" class="screen">
+  <div class="screen-content">
 
-      <button class="menu-button" onclick="startPractice()">
-        <span class="menu-icon">♜</span>
-        <span>
-          <div class="menu-label">Practice</div>
-          <div class="menu-description">Play both sides and practice</div>
-        </span>
-      </button>
+    <div class="home-layout">
+
+      <div class="home-board" id="homeBoard"></div>
+
+      <div class="home-menu">
+        <h1 class="home-title">Play Chess</h1>
+        <p class="home-subtitle">Choose how you want to play.</p>
+
+        <button class="menu-button" onclick="showScreen('bots')">
+          <span class="menu-icon">♟</span>
+          <span>
+            <div class="menu-label">Play Bots</div>
+            <div class="menu-description">Play against computer opponents</div>
+          </span>
+        </button>
+
+        <button class="menu-button" onclick="onlineUnavailable()">
+          <span class="menu-icon">♟</span>
+          <span>
+            <div class="menu-label">Play Online</div>
+            <div class="menu-description">Challenge other players</div>
+          </span>
+        </button>
+
+        <button class="menu-button" onclick="startPractice()">
+          <span class="menu-icon">♜</span>
+          <span>
+            <div class="menu-label">Practice</div>
+            <div class="menu-description">Play both sides and practice</div>
+          </span>
+        </button>
+      </div>
+
     </div>
   </div>
 </section>
@@ -753,66 +770,76 @@ header {
 <!-- BOT SELECTION -->
 
 <section id="bots" class="screen">
-  <div class="page-container">
-    <h1 class="page-title">Choose your opponent</h1>
-    <p class="page-subtitle">Every opponent has their own personality and playing strength.</p>
+  <div class="screen-content">
+    <div class="page-container">
 
-    <div class="bot-grid" id="botGrid"></div>
+      <h1 class="page-title">Choose your opponent</h1>
+      <p class="page-subtitle">Every opponent has their own personality and playing strength.</p>
 
-    <div class="bot-bottom">
-      <button class="start-bot" onclick="startBotGame()" id="startBot" disabled>
-        Choose an opponent
-      </button>
+      <div class="bot-grid" id="botGrid"></div>
+
+      <div class="bot-bottom">
+        <button class="start-bot" onclick="startBotGame()" id="startBot" disabled>
+          Choose an opponent
+        </button>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- GAME -->
+<!-- GAME SCREEN -->
 
 <section id="game" class="screen">
-  <div class="game-layout">
+  <div class="screen-content">
 
-    <div class="board-area">
-      <div class="player">
-        <div class="avatar" id="blackAvatar">♟</div>
-        <span id="blackName">Black</span>
-        <span id="blackElo" style="color:var(--muted);font-size:12px"></span>
+    <div class="game-layout">
+
+      <div class="board-area">
+
+        <div class="player">
+          <div class="avatar" id="blackAvatar">♟</div>
+          <span id="blackName">Black</span>
+          <span id="blackElo" style="color:var(--muted);font-size:12px"></span>
+        </div>
+
+        <div class="board" id="board"></div>
+
+        <div class="player">
+          <div class="avatar">♙</div>
+          <span>You</span>
+        </div>
+
       </div>
 
-      <div class="board" id="board"></div>
+      <aside class="sidebar">
 
-      <div class="player">
-        <div class="avatar">♙</div>
-        <span>You</span>
-      </div>
+        <div class="sidebar-heading">Game</div>
+
+        <div class="game-info">
+
+          <div class="status" id="status">White to move</div>
+
+          <div class="bot-message" id="botMessage">
+            Let's play some chess!
+          </div>
+
+          <div class="moves" id="moves"></div>
+
+          <div class="controls">
+            <button id="undo">↶ Undo</button>
+            <button id="flip">⇅ Flip</button>
+            <button id="restart">↻ Restart</button>
+          </div>
+
+          <button class="action-button" onclick="goBack()">Leave game</button>
+
+        </div>
+      </aside>
+
     </div>
-
-    <aside class="sidebar">
-      <div class="sidebar-heading">Game</div>
-
-      <div class="game-info">
-        <div class="status" id="status">White to move</div>
-
-        <div class="bot-message" id="botMessage">
-          Let's play some chess!
-        </div>
-
-        <div class="moves" id="moves"></div>
-
-        <div class="controls">
-          <button id="undo">↶ Undo</button>
-          <button id="flip">⇅ Flip</button>
-          <button id="restart">↻ Restart</button>
-        </div>
-
-        <button class="action-button" onclick="goBack()">Leave game</button>
-      </div>
-    </aside>
-
   </div>
 </section>
-
-<!-- PROMOTION -->
 
 <div class="promotion" id="promotion">
   <div class="promotion-box" id="promotionChoices"></div>
@@ -821,150 +848,156 @@ header {
 <div class="toast" id="toast"></div>
 
 <script>
-/* ==================================
+
+/* =====================================
    CONFIGURATION
-================================== */
+===================================== */
 
 const piecePaths = {
-  w: 'Resources/Pieces/White/',
-  b: 'Resources/Pieces/Black/'
+  w:'Resources/Pieces/White/',
+  b:'Resources/Pieces/Black/'
 };
 
 const pieceLetters = {
-  p:'p', n:'n', b:'b', r:'r', q:'q', k:'k'
+  p:'p',n:'n',b:'b',r:'r',q:'q',k:'k'
 };
 
 const bots = [
   {
-    name:'Julian',
-    elo:500,
-    avatar:'🧑‍💻',
-    description:'A beginner who enjoys playing chess.',
+    name:'Zach',
+    elo:100,
+    avatar:'😎',
+    description:'A brand new chess player. Still learning the pieces.',
     quote:'Lets play some Chess!',
-    strength:500
+    strength:100
   },
   {
-    name:'Oliver',
-    elo:650,
-    avatar:'👨‍🎓',
-    description:'Still learning, but knows a few tricks.',
-    quote:'I hope I remember my openings.',
-    strength:650
+    name:'June',
+    elo:100,
+    avatar:'🌸',
+    description:'Plays casually and sometimes forgets the rules.',
+    quote:'I hope I win!',
+    strength:100
   },
   {
-    name:'Max',
-    elo:800,
-    avatar:'🧢',
-    description:'Likes aggressive moves and quick attacks.',
-    quote:'You ready? I am.',
-    strength:800
+    name:'Pepe',
+    elo:150,
+    avatar:'🐸',
+    description:'A relaxed player who likes random moves.',
+    quote:'Easy game.',
+    strength:150
   },
   {
-    name:'Sophia',
+    name:'Martin',
+    elo:250,
+    avatar:'🎩',
+    description:'Knows a few tricks but makes plenty of mistakes.',
+    quote:'I have a strategy!',
+    strength:250
+  },
+  {
+    name:'Elani',
+    elo:400,
+    avatar:'⭐',
+    description:'Learning openings and trying to improve.',
+    quote:'Lets see what happens.',
+    strength:400
+  },
+  {
+    name:'Janjay',
+    elo:700,
+    avatar:'🎮',
+    description:'A decent player who likes attacking.',
+    quote:'Ready for a challenge?',
+    strength:700
+  },
+  {
+    name:'Maria',
     elo:1000,
-    avatar:'👩‍💻',
-    description:'A balanced player who likes strategy.',
-    quote:'Lets see what you have.',
+    avatar:'🌷',
+    description:'A balanced player who enjoys tactical positions.',
+    quote:'Think carefully!',
     strength:1000
   },
   {
-    name:'Daniel',
-    elo:1200,
-    avatar:'🧑‍🎨',
-    description:'Good at tactics, sometimes gets impatient.',
-    quote:'I have a plan.',
-    strength:1200
-  },
-  {
-    name:'Alex',
-    elo:1400,
-    avatar:'🕶️',
-    description:'A strong opponent with a competitive style.',
+    name:'Nelson',
+    elo:1300,
+    avatar:'🧑‍💻',
+    description:'Experienced and fairly consistent.',
     quote:'This should be interesting.',
-    strength:1400
+    strength:1300
   },
   {
-    name:'Emma',
-    elo:1600,
-    avatar:'👩‍🏫',
-    description:'Careful with positioning and development.',
-    quote:'Think carefully about your moves.',
-    strength:1600
+    name:'Magnus Carlsen',
+    elo:2882,
+    avatar:'♟',
+    description:'The legendary grandmaster. The toughest opponent.',
+    quote:'Good luck. You will need it.',
+    strength:2882
   },
   {
-    name:'Lucas',
-    elo:1800,
-    avatar:'🎮',
-    description:'An experienced player who likes complex positions.',
-    quote:'Good luck. You might need it.',
-    strength:1800
-  },
-  {
-    name:'Morgan',
-    elo:2000,
-    avatar:'🧠',
-    description:'A very strong strategic opponent.',
-    quote:'Lets have a good game.',
-    strength:2000
+    name:'Jaylen Brown',
+    elo:1500,
+    avatar:'🏀',
+    description:'A competitive player who likes aggressive chess.',
+    quote:'Lets get this game started!',
+    strength:1500
   }
 ];
 
 const dialogue = {
-  start:[
-    "Let's play some chess!",
-    "Good luck!",
-    "Ready when you are.",
-    "I hope this is a good game.",
-    "Let's see how this goes.",
-    "Your move!",
-    "I've been practicing."
-  ],
   thinking:[
-    "Hmm, interesting.",
-    "Let me think about that.",
-    "I wasn't expecting that.",
-    "Nice move!",
-    "Interesting position.",
-    "I have an idea.",
-    "Let's see...",
-    "That's a clever move.",
-    "Not bad!",
-    "Okay, my turn."
+    'Hmm, interesting.',
+    'Let me think about that.',
+    'I wasnt expecting that.',
+    'Nice move!',
+    'Interesting position.',
+    'I have an idea.',
+    'Lets see...',
+    'Thats a clever move.',
+    'Not bad!',
+    'Okay, my turn.'
   ],
   capture:[
-    "Gotcha!",
-    "I'll take that.",
-    "A little trade.",
-    "Thanks for the piece.",
-    "Interesting trade."
+    'Gotcha!',
+    'Ill take that.',
+    'A little trade.',
+    'Thanks for the piece.',
+    'Interesting trade.'
   ],
   mistake:[
-    "Oops. That might not have been right.",
-    "I should have thought longer.",
-    "Hmm, questionable move.",
-    "Let's pretend that was intentional.",
-    "I may have made a mistake."
+    'Oops. That might not have been right.',
+    'I should have thought longer.',
+    'Hmm, questionable move.',
+    'Lets pretend that was intentional.',
+    'I may have made a mistake.'
   ],
   check:[
-    "Check!",
-    "Watch your king!",
-    "Your king is in trouble."
+    'Check!',
+    'Watch your king!',
+    'Your king is in trouble.'
   ],
   win:[
-    "Good game!",
-    "That was fun!",
-    "Well played!",
-    "Nice try!",
-    "GG!"
+    'Good game!',
+    'That was fun!',
+    'Well played!',
+    'Nice try!',
+    'GG!'
   ],
   lose:[
-    "Well played!",
-    "You got me!",
-    "I need more practice.",
-    "Good game!",
-    "Rematch sometime?"
+    'Well played!',
+    'You got me!',
+    'I need more practice.',
+    'Good game!',
+    'Rematch sometime?'
   ]
 };
+
+/* =====================================
+   STATE
+===================================== */
+
+let screenHistory = ['boot'];
 
 let selectedBot = null;
 let game = null;
@@ -975,58 +1008,99 @@ let pendingPromotion = null;
 let botThinking = false;
 let botTimer = null;
 let toastTimer = null;
-let lastMove = null;
 let messageLast = '';
 
-/* ==================================
+/* =====================================
    SCREEN NAVIGATION
-================================== */
+===================================== */
 
 function showScreen(id) {
+  const current=screenHistory[screenHistory.length-1];
+
+  if(current===id)return;
+
+  screenHistory.push(id);
+  renderScreen();
+}
+
+function renderScreen() {
+  const id=screenHistory[screenHistory.length-1];
+
   document.querySelectorAll('.screen').forEach(s=>{
     s.classList.remove('active');
   });
 
   document.getElementById(id).classList.add('active');
 
-  document.getElementById('header').style.display =
+  document.getElementById('header').style.display=
     id==='boot'?'none':'flex';
 
-  if(id==='home') renderHomeBoard();
+  if(id==='home')renderHomeBoard();
+
+  if(id==='boot') {
+    const video=document.querySelector('.hero-video');
+    if(video)video.play().catch(()=>{});
+  }
 }
 
 function goBack() {
-  clearTimeout(botTimer);
-  botThinking=false;
-  pendingPromotion=null;
-  document.getElementById('promotion').style.display='none';
-  showScreen(mode==='practice'?'home':'bots');
+  if(screenHistory.length<=1)return;
+
+  const current=screenHistory.pop();
+
+  if(current==='game') {
+    clearTimeout(botTimer);
+    botThinking=false;
+    pendingPromotion=null;
+    document.getElementById('promotion').style.display='none';
+  }
+
+  renderScreen();
 }
 
-/* ==================================
-   RANDOM DIALOGUE
-================================== */
+/* =====================================
+   PROFILE IMAGE LOADING
+===================================== */
 
-function randomLine(category) {
-  const lines=dialogue[category]||dialogue.thinking;
-  let available=lines.filter(x=>x!==messageLast);
-  if(!available.length)available=lines;
-
-  const line=available[Math.floor(Math.random()*available.length)];
-  messageLast=line;
-  document.getElementById('botMessage').textContent=line;
+function profileImage(name) {
+  return 'Resources/bots/profiles/'+name.toLowerCase().replace(/\s+/g,'-');
 }
 
-function setMessage(text) {
-  messageLast=text;
-  document.getElementById('botMessage').textContent=text;
+function loadProfile(img,name,fallback) {
+  const base=profileImage(name);
+
+  const paths=[
+    base+'.png',
+    base+'.jpg',
+    base+'.jpeg',
+    base+'.webp',
+    base+'.svg',
+    'Resources/bots/profiles/'+name+'.png',
+    'Resources/bots/profiles/'+name+'.jpg',
+    'Resources/bots/profiles/'+name+'.webp'
+  ];
+
+  let index=0;
+
+  img.onerror=()=>{
+    index++;
+
+    if(index<paths.length) {
+      img.src=paths[index];
+    } else {
+      img.style.display='none';
+      fallback.style.display='grid';
+    }
+  };
+
+  img.src=paths[0];
 }
 
-/* ==================================
-   BOOT AND HOME BOARDS
-================================== */
+/* =====================================
+   HOME BOARD
+===================================== */
 
-function createPreviewBoard(container,interactive=false) {
+function createPreviewBoard(container) {
   container.innerHTML='';
 
   const backrank=['r','n','b','q','k','b','n','r'];
@@ -1041,10 +1115,10 @@ function createPreviewBoard(container,interactive=false) {
     let piece=null;
     let side=null;
 
-    if(row===0) {piece=backrank[col];side='b';}
-    if(row===1) {piece='p';side='b';}
-    if(row===6) {piece='p';side='w';}
-    if(row===7) {piece=backrank[col];side='w';}
+    if(row===0){piece=backrank[col];side='b'}
+    if(row===1){piece='p';side='b'}
+    if(row===6){piece='p';side='w'}
+    if(row===7){piece=backrank[col];side='w'}
 
     if(piece) {
       const img=document.createElement('img');
@@ -1061,11 +1135,9 @@ function renderHomeBoard() {
   createPreviewBoard(document.getElementById('homeBoard'));
 }
 
-createPreviewBoard(document.getElementById('bootBoard'));
-
-/* ==================================
+/* =====================================
    BOT SELECTION
-================================== */
+===================================== */
 
 function renderBots() {
   const grid=document.getElementById('botGrid');
@@ -1073,23 +1145,50 @@ function renderBots() {
 
   bots.forEach((bot,index)=>{
     const card=document.createElement('div');
-    card.className='bot-card'+(selectedBot===index?' selected':'');
 
-    card.innerHTML=`
-      <div class="bot-top">
-        <div class="bot-avatar">${bot.avatar}</div>
-        <div>
-          <div class="bot-name">${bot.name}</div>
-          <div class="bot-elo">${bot.elo} Elo</div>
-        </div>
-      </div>
-      <div class="bot-description">${bot.description}</div>
-      <div class="bot-quote">"${bot.quote}"</div>
-    `;
+    card.className='bot-card'+
+      (selectedBot===index?' selected':'');
+
+    const cover=document.createElement('div');
+    cover.className='bot-cover';
+
+    const img=document.createElement('img');
+    const fallback=document.createElement('div');
+
+    fallback.className='bot-cover-fallback';
+    fallback.textContent=bot.avatar;
+    fallback.style.display='none';
+
+    loadProfile(img,bot.name,fallback);
+
+    cover.append(img,fallback);
+
+    const details=document.createElement('div');
+    details.className='bot-details';
+
+    const name=document.createElement('div');
+    name.className='bot-name';
+    name.textContent=bot.name;
+
+    const elo=document.createElement('div');
+    elo.className='bot-elo';
+    elo.textContent=bot.elo.toLocaleString()+' Elo';
+
+    const description=document.createElement('div');
+    description.className='bot-description';
+    description.textContent=bot.description;
+
+    const quote=document.createElement('div');
+    quote.className='bot-quote';
+    quote.textContent='"'+bot.quote+'"';
+
+    details.append(name,elo,description,quote);
+    card.append(cover,details);
 
     card.onclick=()=>{
       selectedBot=index;
       renderBots();
+
       document.getElementById('startBot').disabled=false;
       document.getElementById('startBot').textContent='Play '+bot.name;
     };
@@ -1098,28 +1197,40 @@ function renderBots() {
   });
 }
 
-document.getElementById('startBot').disabled=true;
 renderBots();
 
-/* ==================================
-   START GAMES
-================================== */
+/* =====================================
+   GAME START
+===================================== */
 
 function startBotGame() {
   if(selectedBot===null)return;
 
   mode='bot';
+
   const bot=bots[selectedBot];
 
   document.getElementById('blackName').textContent=bot.name;
-  document.getElementById('blackElo').textContent=bot.elo+' Elo';
-  document.getElementById('blackAvatar').textContent=bot.avatar;
+  document.getElementById('blackElo').textContent=
+    bot.elo.toLocaleString()+' Elo';
+
+  const avatar=document.getElementById('blackAvatar');
+  avatar.innerHTML='';
+
+  const img=document.createElement('img');
+  const fallback=document.createElement('span');
+  fallback.textContent=bot.avatar;
+  fallback.style.display='none';
+
+  loadProfile(img,bot.name,fallback);
+  avatar.append(img,fallback);
 
   startGame();
 }
 
 function startPractice() {
   mode='practice';
+
   document.getElementById('blackName').textContent='Black';
   document.getElementById('blackElo').textContent='';
   document.getElementById('blackAvatar').textContent='♟';
@@ -1135,61 +1246,58 @@ function startGame() {
   selectedSquare=null;
   pendingPromotion=null;
   botThinking=false;
-  lastMove=null;
   messageLast='';
 
-  setMessage(mode==='bot'?
-    randomStartMessage():
-    'Practice mode. Play both sides at your own pace.'
-  );
+  if(mode==='bot') {
+    const bot=bots[selectedBot];
+    const messages=[
+      'Lets play some chess!',
+      'Ready for a game?',
+      'Good luck! Youll need it.',
+      'Ive been waiting for a match.',
+      'Lets see who wins this one.',
+      'Your move!',
+      'Hope youre ready!'
+    ];
 
-  showScreen('game');
+    setMessage(bot.name+': '+
+      messages[Math.floor(Math.random()*messages.length)]);
+  } else {
+    setMessage('Practice mode. Play both sides at your own pace.');
+  }
+
   renderGame();
 }
 
-function randomStartMessage() {
-  const bot=bots[selectedBot];
-  const messages=[
-    "Let's play some chess!",
-    "Ready for a game?",
-    "Good luck! You'll need it.",
-    "I've been waiting for a match.",
-    "Let's see who wins this one.",
-    "Your move!",
-    "Hope you're ready!"
-  ];
-  return bot.name+': '+messages[Math.floor(Math.random()*messages.length)];
-}
-
-/* ==================================
-   BOARD
-================================== */
+/* =====================================
+   BOARD RENDERING
+===================================== */
 
 function squareName(row,col) {
   return 'abcdefgh'[col]+(8-row);
 }
 
 function renderGame() {
-  const boardElement=document.getElementById('board');
-  boardElement.innerHTML='';
+  const element=document.getElementById('board');
+  element.innerHTML='';
 
   const board=game.board();
   const legal=selectedSquare?
     game.moves({square:selectedSquare,verbose:true}):[];
 
   const destinations=legal.map(m=>m.to);
-  const last=game.history({verbose:true});
-  lastMove=last.length?last[last.length-1]:null;
+  const history=game.history({verbose:true});
+  const lastMove=history.length?history[history.length-1]:null;
 
   for(let display=0;display<64;display++) {
     const i=flipped?63-display:display;
     const row=Math.floor(i/8);
     const col=i%8;
-    const square=document.createElement('div');
+    const name=squareName(row,col);
 
+    const square=document.createElement('div');
     square.className='square '+((row+col)%2===0?'light':'dark');
 
-    const name=squareName(row,col);
     const piece=board[row][col];
 
     if(selectedSquare===name)square.classList.add('selected');
@@ -1200,7 +1308,8 @@ function renderGame() {
 
     if(piece) {
       const img=document.createElement('img');
-      img.src=piecePaths[piece.color]+piece.color+pieceLetters[piece.type]+'.png';
+      img.src=piecePaths[piece.color]+
+        piece.color+pieceLetters[piece.type]+'.png';
       img.alt=piece.color+piece.type;
       img.draggable=false;
       square.appendChild(img);
@@ -1227,17 +1336,20 @@ function renderGame() {
     }
 
     square.addEventListener('click',()=>clickSquare(name));
-    boardElement.appendChild(square);
+    element.appendChild(square);
   }
 
   renderMoves();
   updateStatus();
-  document.getElementById('undo').disabled=game.history().length===0;
+
+  document.getElementById('undo').disabled=
+    game.history().length===0;
 }
 
 function renderMoves() {
   const element=document.getElementById('moves');
   const history=game.history();
+
   element.innerHTML='';
 
   for(let i=0;i<history.length;i+=2) {
@@ -1267,21 +1379,24 @@ function updateStatus() {
   const status=document.getElementById('status');
 
   if(game.in_checkmate()) {
-    status.textContent='Checkmate! '+(game.turn()==='w'?'Black':'White')+' wins.';
+    status.textContent='Checkmate! '+
+      (game.turn()==='w'?'Black':'White')+' wins.';
   } else if(game.in_stalemate()) {
     status.textContent='Draw by stalemate.';
   } else if(game.in_draw()) {
     status.textContent='Game drawn.';
   } else if(game.in_check()) {
-    status.textContent=(game.turn()==='w'?'White':'Black')+' to move · Check';
+    status.textContent=
+      (game.turn()==='w'?'White':'Black')+' to move · Check';
   } else {
-    status.textContent=(game.turn()==='w'?'White':'Black')+' to move';
+    status.textContent=
+      (game.turn()==='w'?'White':'Black')+' to move';
   }
 }
 
-/* ==================================
+/* =====================================
    PLAYER MOVES
-================================== */
+===================================== */
 
 function clickSquare(square) {
   if(game.game_over()||botThinking||pendingPromotion)return;
@@ -1318,7 +1433,11 @@ function clickSquare(square) {
   const move=possible[0];
 
   if(move.flags.includes('p')) {
-    pendingPromotion={from:selectedSquare,to:square};
+    pendingPromotion={
+      from:selectedSquare,
+      to:square
+    };
+
     selectedSquare=null;
     showPromotion();
     return;
@@ -1351,13 +1470,14 @@ function makePlayerMove(move) {
   }
 }
 
-/* ==================================
+/* =====================================
    PROMOTION
-================================== */
+===================================== */
 
 function showPromotion() {
   const box=document.getElementById('promotion');
   const choices=document.getElementById('promotionChoices');
+
   choices.innerHTML='';
 
   for(const p of ['q','r','b','n']) {
@@ -1374,10 +1494,7 @@ function showPromotion() {
       const move=pendingPromotion;
       pendingPromotion=null;
 
-      makePlayerMove({
-        ...move,
-        promotion:p
-      });
+      makePlayerMove({...move,promotion:p});
     };
 
     choices.appendChild(btn);
@@ -1386,9 +1503,28 @@ function showPromotion() {
   box.style.display='flex';
 }
 
-/* ==================================
+/* =====================================
+   BOT DIALOGUE
+===================================== */
+
+function randomLine(category) {
+  const lines=dialogue[category]||dialogue.thinking;
+
+  let available=lines.filter(x=>x!==messageLast);
+  if(!available.length)available=lines;
+
+  const line=available[Math.floor(Math.random()*available.length)];
+  setMessage(line);
+}
+
+function setMessage(text) {
+  messageLast=text;
+  document.getElementById('botMessage').textContent=text;
+}
+
+/* =====================================
    BOT BRAIN
-================================== */
+===================================== */
 
 const pieceValues={
   p:100,
@@ -1399,7 +1535,7 @@ const pieceValues={
   k:20000
 };
 
-function evaluateMove(move,botColor) {
+function evaluateMove(move) {
   let score=0;
 
   const piece=game.get(move.from);
@@ -1407,7 +1543,6 @@ function evaluateMove(move,botColor) {
 
   if(captured) {
     score+=pieceValues[captured.type]*0.9;
-    score-=pieceValues[piece.type]*0.04;
   }
 
   if(move.flags.includes('p'))score+=850;
@@ -1417,33 +1552,30 @@ function evaluateMove(move,botColor) {
 
   const col='abcdefgh'.indexOf(move.to[0]);
   const row=Number(move.to[1])-1;
-
   const centerDistance=Math.abs(3.5-col)+Math.abs(3.5-row);
+
   score+=(7-centerDistance)*3;
 
   if(piece.type==='n'||piece.type==='b') {
-    const homeRank=botColor==='b'?8:1;
+    const homeRank=game.turn()==='b'?8:1;
     if(Number(move.from[1])===homeRank)score+=10;
   }
 
   if(move.san==='O-O'||move.san==='O-O-O')score+=35;
 
-  score+=Math.random()*18;
-
   return score;
 }
 
-function botDifficulty(bot) {
-  const strength=bot.strength;
-
-  if(strength<=600)return 0.65;
-  if(strength<=800)return 0.54;
-  if(strength<=1000)return 0.43;
-  if(strength<=1200)return 0.34;
-  if(strength<=1400)return 0.26;
-  if(strength<=1600)return 0.20;
-  if(strength<=1800)return 0.15;
-  return 0.12;
+function botMistakeChance(bot) {
+  if(bot.elo<=150)return .85;
+  if(bot.elo<=250)return .78;
+  if(bot.elo<=400)return .69;
+  if(bot.elo<=700)return .56;
+  if(bot.elo<=1000)return .43;
+  if(bot.elo<=1300)return .32;
+  if(bot.elo<=1500)return .25;
+  if(bot.elo<=2000)return .17;
+  return .09;
 }
 
 function chooseBotMove() {
@@ -1452,31 +1584,35 @@ function chooseBotMove() {
   if(!moves.length)return null;
 
   const bot=bots[selectedBot];
-  const mistakeChance=botDifficulty(bot);
+  const mistakeChance=botMistakeChance(bot);
 
   const evaluated=moves.map(move=>({
     move,
-    score:evaluateMove(move,'b')
+    score:evaluateMove(move)+Math.random()*15
   }));
 
   evaluated.sort((a,b)=>b.score-a.score);
 
-  // Occasionally choose a less accurate move.
   if(Math.random()<mistakeChance) {
-    const options=evaluated.slice(
-      Math.max(0,Math.floor(evaluated.length*0.35))
+    const lowerMoves=evaluated.slice(
+      Math.max(0,Math.floor(evaluated.length*.3))
     );
 
-    return options[Math.floor(Math.random()*options.length)].move;
+    return lowerMoves[
+      Math.floor(Math.random()*lowerMoves.length)
+    ].move;
   }
 
-  // Weaker bots consider fewer good candidate moves.
-  const candidateCount=bot.strength<700?4:
-    bot.strength<1000?3:
-    bot.strength<1400?2:2;
+  const count=bot.elo<=400?5:
+    bot.elo<=700?4:
+    bot.elo<=1300?3:
+    bot.elo<=2000?2:2;
 
-  const candidates=evaluated.slice(0,candidateCount);
-  return candidates[Math.floor(Math.random()*candidates.length)].move;
+  const candidates=evaluated.slice(0,count);
+
+  return candidates[
+    Math.floor(Math.random()*candidates.length)
+  ].move;
 }
 
 function scheduleBot() {
@@ -1496,8 +1632,6 @@ function scheduleBot() {
       botThinking=false;
       return;
     }
-
-    const bot=bots[selectedBot];
 
     try {
       game.move({
@@ -1521,16 +1655,16 @@ function scheduleBot() {
 
     if(game.in_check()) {
       randomLine('check');
-    } else if(Math.random()<0.3) {
+    } else if(Math.random()<.3) {
       randomLine(move.captured?'capture':'thinking');
     }
 
-  },900+Math.random()*900);
+  },850+Math.random()*1100);
 }
 
-/* ==================================
+/* =====================================
    END GAME
-================================== */
+===================================== */
 
 function finishGame() {
   botThinking=false;
@@ -1539,18 +1673,18 @@ function finishGame() {
 
   if(game.in_checkmate()) {
     if(game.turn()==='w') {
-      setMessage('You lost! '+dialogue.win[Math.floor(Math.random()*dialogue.win.length)]);
+      randomLine('win');
     } else {
-      setMessage('You won! '+dialogue.lose[Math.floor(Math.random()*dialogue.lose.length)]);
+      randomLine('lose');
     }
   } else {
     setMessage('Draw! Good game.');
   }
 }
 
-/* ==================================
-   CONTROLS
-================================== */
+/* =====================================
+   GAME CONTROLS
+===================================== */
 
 document.getElementById('undo').onclick=()=>{
   if(!game||!game.history().length)return;
@@ -1573,18 +1707,19 @@ document.getElementById('flip').onclick=()=>{
 };
 
 document.getElementById('restart').onclick=()=>{
-  if(!game)return;
-  startGame();
+  if(game)startGame();
 };
 
-/* ==================================
-   ONLINE MESSAGE
-================================== */
+/* =====================================
+   ONLINE PLACEHOLDER
+===================================== */
 
 function onlineUnavailable() {
   const toast=document.getElementById('toast');
 
-  toast.textContent='Online is currently unavailable! Come back soon...';
+  toast.textContent=
+    'Online is currently unavailable! Come back soon...';
+
   toast.classList.add('show');
 
   clearTimeout(toastTimer);
@@ -1593,6 +1728,12 @@ function onlineUnavailable() {
     toast.classList.remove('show');
   },3500);
 }
+
+/* =====================================
+   INITIALIZE
+===================================== */
+
+renderHomeBoard();
 
 </script>
 </body>
