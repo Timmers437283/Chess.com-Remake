@@ -259,141 +259,21 @@ header {
   margin-top:3px;
 }
 
-/* BOTS */
-
-.page-container {
-  max-width:1100px;
-  width:94%;
-  margin:40px auto;
-}
-
-.page-title {
-  font-size:30px;
-  margin:0;
-  letter-spacing:-.8px;
-}
-
-.page-subtitle {
-  color:var(--muted);
-  margin:9px 0 28px;
-  font-size:14px;
-}
-
-.bot-grid {
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:13px;
-}
-
-.bot-card {
-  background:#262421;
-  border:1px solid #3d3933;
-  border-radius:6px;
-  overflow:hidden;
-  cursor:pointer;
-  transition:background .15s,border .15s;
-}
-
-.bot-card:hover {
-  background:#35322d;
-  border-color:#777066;
-}
-
-.bot-card.selected {
-  border:2px solid var(--green);
-  background:#34392c;
-}
-
-.bot-cover {
-  width:100%;
-  aspect-ratio:2.1/1;
-  background:#39362f;
-  position:relative;
-  overflow:hidden;
-}
-
-.bot-cover img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.bot-cover-fallback {
-  width:100%;
-  height:100%;
-  display:grid;
-  place-items:center;
-  font-size:45px;
-  background:#37342e;
-}
-
-.bot-details {
-  padding:14px;
-}
-
-.bot-name {
-  font-weight:700;
-  font-size:16px;
-}
-
-.bot-elo {
-  font-size:12px;
-  color:var(--muted);
-  margin-top:4px;
-}
-
-.bot-description {
-  font-size:12px;
-  color:#b9b4aa;
-  margin-top:12px;
-  line-height:1.5;
-}
-
-.bot-quote {
-  color:#a8c982;
-  font-size:12px;
-  margin-top:9px;
-}
-
-.bot-bottom {
-  margin-top:25px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.start-bot {
-  height:48px;
-  background:var(--green);
-  color:white;
-  border:none;
-  border-radius:5px;
-  font-size:15px;
-  font-weight:700;
-  padding:0 28px;
-}
-
-.start-bot:disabled {
-  opacity:.4;
-  cursor:default;
-}
-
-.start-bot:not(:disabled):hover {
-  background:#91c75a;
-}
-
-/* GAME */
+/* GAME / PLAY BOTS LAYOUT */
 
 .game-layout {
-  width:min(1100px,95%);
-  margin:30px auto;
-  display:grid;
-  grid-template-columns:minmax(0,650px) minmax(250px,330px);
-  gap:25px;
-  align-items:start;
+  display:flex;
+  justify-content:center;
+  align-items:stretch;
+  gap:20px;
+  margin:22px auto;
+  padding:0 16px;
 }
 
-.board-area {width:100%}
+.board-area {
+  flex:0 0 auto;
+  width:max(300px,min(100vw - 450px,100vh - 215px,760px));
+}
 
 .player {
   height:49px;
@@ -405,17 +285,25 @@ header {
 }
 
 .avatar {
-  width:31px;
-  height:31px;
+  width:40px;
+  height:40px;
   background:#44413b;
   border-radius:5px;
   display:grid;
   place-items:center;
-  font-size:19px;
+  font-size:22px;
   overflow:hidden;
+  flex:none;
 }
 
-.avatar img {
+.av {
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+}
+
+.av img {
   width:100%;
   height:100%;
   object-fit:cover;
@@ -487,43 +375,196 @@ header {
 .light .coordinates {color:var(--dark)}
 .dark .coordinates {color:var(--light)}
 
+/* SIDEBAR */
+
 .sidebar {
+  flex:0 0 390px;
+  position:relative;
   background:var(--panel);
-  border-radius:5px;
+  border-radius:6px;
   overflow:hidden;
 }
 
+.sidebar-inner {
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+}
+
 .sidebar-heading {
-  padding:17px;
+  flex:none;
+  padding:16px;
+  background:#201f1c;
   border-bottom:1px solid #3b3935;
   font-weight:700;
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+
+.panel {
+  flex:1;
+  min-height:0;
+  flex-direction:column;
+}
+
+.panel-scroll {
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  padding:22px 16px 10px;
+}
+
+.panel-scroll::-webkit-scrollbar {width:7px}
+.panel-scroll::-webkit-scrollbar-thumb {background:#4a4741;border-radius:4px}
+
+.panel-bottom {
+  flex:none;
+  padding:14px 16px 16px;
+  border-top:1px solid #3b3935;
+  background:#262421;
+}
+
+.bot-intro {
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.big-avatar {
+  width:92px;
+  height:92px;
+  flex:none;
+  font-size:56px;
+  display:grid;
+  place-items:center;
+}
+
+.big-avatar img {object-fit:contain}
+
+.speech {
+  position:relative;
+  flex:1;
+  background:#fff;
+  color:#262421;
+  padding:15px 17px;
+  border-radius:10px;
+  font-size:15px;
+  font-weight:600;
+  line-height:1.4;
+}
+
+.speech::before {
+  content:'';
+  position:absolute;
+  left:-9px;
+  top:50%;
+  margin-top:-9px;
+  border:9px solid transparent;
+  border-left:0;
+  border-right-color:#fff;
+}
+
+.intro-name {
+  margin:8px 0 18px;
+  font-size:17px;
+  font-weight:700;
+}
+
+.intro-name span {
+  color:var(--muted);
+  font-size:14px;
+  font-weight:500;
+  margin-left:8px;
+}
+
+.group {
+  background:#2d2b28;
+  border-radius:6px;
+  padding:14px;
+  margin-bottom:12px;
+}
+
+.group-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+  font-weight:700;
   font-size:15px;
 }
 
-.game-info {padding:17px}
+.group-head span {
+  color:var(--muted);
+  font-size:12px;
+  font-weight:500;
+}
+
+.tile-grid {
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+
+.tile {
+  aspect-ratio:1;
+  padding:0;
+  border:2px solid transparent;
+  border-radius:5px;
+  background:#3b3834;
+  overflow:hidden;
+  font-size:26px;
+  color:white;
+  transition:transform .12s,border-color .12s;
+}
+
+.tile:hover {
+  transform:translateY(-2px);
+  border-color:#777066;
+}
+
+.tile.selected {
+  border-color:var(--green);
+  background:#44503a;
+}
+
+.play-btn {
+  width:100%;
+  height:56px;
+  background:var(--green);
+  color:white;
+  border:none;
+  border-radius:6px;
+  font-size:22px;
+  font-weight:700;
+  box-shadow:0 4px 0 #5d8a35;
+  transition:background .15s;
+}
+
+.play-btn:hover {background:#91c75a}
+.play-btn:active {transform:translateY(2px);box-shadow:0 2px 0 #5d8a35}
+
+/* GAME PANEL */
+
+#gamePanel {
+  padding:16px;
+  gap:12px;
+}
 
 .status {
+  flex:none;
   font-size:15px;
   font-weight:700;
-  margin-bottom:14px;
-}
-
-.bot-message {
-  padding:12px;
-  background:#34312c;
-  border-radius:5px;
-  margin-bottom:15px;
-  font-size:13px;
-  line-height:1.5;
-  color:#ddd8cf;
-  min-height:52px;
 }
 
 .moves {
+  flex:1;
+  min-height:80px;
   background:#201f1c;
   border-radius:4px;
-  min-height:150px;
-  max-height:270px;
   overflow-y:auto;
   padding:8px;
 }
@@ -541,10 +582,10 @@ header {
 .move {font-weight:500}
 
 .controls {
+  flex:none;
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:8px;
-  margin-top:14px;
 }
 
 .controls button {
@@ -561,10 +602,10 @@ header {
 .controls button:disabled {opacity:.35;cursor:default}
 
 .action-button {
+  flex:none;
   width:100%;
   height:44px;
-  margin-top:10px;
-  background:var(--green);
+  background:#45423c;
   border:none;
   border-radius:4px;
   color:white;
@@ -572,7 +613,7 @@ header {
   font-weight:700;
 }
 
-.action-button:hover {background:#91c75a}
+.action-button:hover {background:#57534b}
 
 /* PROMOTION */
 
@@ -634,7 +675,7 @@ header {
 
 /* RESPONSIVE */
 
-@media(max-width:850px) {
+@media(max-width:900px) {
   .landing-content {
     grid-template-columns:1fr;
     max-width:550px;
@@ -656,13 +697,25 @@ header {
   }
 
   .game-layout {
-    display:flex;
     flex-direction:column;
-    max-width:620px;
-    margin:15px auto;
+    align-items:center;
+    margin:12px auto;
+    padding:0;
   }
 
-  .sidebar {width:100%}
+  .board-area {
+    width:min(100%,620px);
+    padding:0 7px;
+  }
+
+  .player {padding:0 7px}
+
+  .sidebar {
+    flex:none;
+    width:min(100%,620px);
+    height:600px;
+    border-radius:0;
+  }
 }
 
 @media(max-width:650px) {
@@ -672,17 +725,6 @@ header {
   .landing-content {width:90%;gap:25px}
   .landing-text h1 {font-size:34px}
   .landing-text p {font-size:15px}
-  .page-container {margin:25px auto}
-  .bot-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
-  .page-title {font-size:26px}
-  .game-layout {width:100%}
-  .board-area {padding:0 7px}
-  .player {padding:0 7px}
-  .sidebar {border-radius:0}
-}
-
-@media(max-width:390px) {
-  .bot-grid {grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -737,7 +779,7 @@ header {
         <h1 class="home-title">Play Chess</h1>
         <p class="home-subtitle">Choose how you want to play.</p>
 
-        <button class="menu-button" onclick="showScreen('bots')">
+        <button class="menu-button" onclick="openBots()">
           <span class="menu-icon">♟</span>
           <span>
             <div class="menu-label">Play Bots</div>
@@ -766,28 +808,7 @@ header {
   </div>
 </section>
 
-<!-- BOT SELECTION -->
-
-<section id="bots" class="screen">
-  <div class="screen-content">
-    <div class="page-container">
-
-      <h1 class="page-title">Choose your opponent</h1>
-      <p class="page-subtitle">Every opponent has their own personality and playing strength.</p>
-
-      <div class="bot-grid" id="botGrid"></div>
-
-      <div class="bot-bottom">
-        <button class="start-bot" onclick="startBotGame()" id="startBot" disabled>
-          Choose an opponent
-        </button>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- GAME SCREEN -->
+<!-- GAME / PLAY BOTS SCREEN -->
 
 <section id="game" class="screen">
   <div class="screen-content">
@@ -812,26 +833,56 @@ header {
       </div>
 
       <aside class="sidebar">
+        <div class="sidebar-inner">
 
-        <div class="sidebar-heading">Game</div>
-
-        <div class="game-info">
-
-          <div class="status" id="status">White to move</div>
-
-          <div class="bot-message" id="botMessage">
-            Let's play some chess!
+          <div class="sidebar-heading">
+            <span id="headingIcon">🤖</span>
+            <span id="headingText">Play Bots</span>
           </div>
 
-          <div class="moves" id="moves"></div>
+          <!-- BOT SELECTION PANEL -->
+          <div class="panel" id="selectPanel" style="display:flex">
 
-          <div class="controls">
-            <button id="undo">↶ Undo</button>
-            <button id="flip">⇅ Flip</button>
-            <button id="restart">↻ Restart</button>
+            <div class="panel-scroll">
+              <div class="bot-intro">
+                <div class="big-avatar" id="introAvatar"></div>
+                <div class="speech" id="introSpeech"></div>
+              </div>
+
+              <div class="intro-name">
+                <b id="introName"></b><span id="introElo"></span>
+              </div>
+
+              <div id="botGroups"></div>
+            </div>
+
+            <div class="panel-bottom">
+              <button class="play-btn" onclick="startBotGame()">Play</button>
+            </div>
+
           </div>
 
-          <button class="action-button" onclick="goBack()">Leave game</button>
+          <!-- IN-GAME PANEL -->
+          <div class="panel" id="gamePanel" style="display:none">
+
+            <div class="bot-intro" id="gameBotHead">
+              <div class="big-avatar" id="gameBotAvatar"></div>
+              <div class="speech" id="botMessage">Let's play some chess!</div>
+            </div>
+
+            <div class="status" id="status">White to move</div>
+
+            <div class="moves" id="moves"></div>
+
+            <div class="controls">
+              <button id="undo">↶ Undo</button>
+              <button id="flip">⇅ Flip</button>
+              <button id="restart">↻ Restart</button>
+            </div>
+
+            <button class="action-button" onclick="leaveGame()">Leave game</button>
+
+          </div>
 
         </div>
       </aside>
@@ -861,10 +912,13 @@ const pieceLetters = {
   p:'p',n:'n',b:'b',r:'r',q:'q',k:'k'
 };
 
+const groups = ['Beginner','Intermediate','Master'];
+
 const bots = [
   {
     name:'Zach',
     elo:100,
+    group:'Beginner',
     avatar:'😎',
     description:'A brand new chess player. Still learning the pieces.',
     quote:'Lets play some Chess!',
@@ -873,6 +927,7 @@ const bots = [
   {
     name:'June',
     elo:100,
+    group:'Beginner',
     avatar:'🌸',
     description:'Plays casually and sometimes forgets the rules.',
     quote:'I hope I win!',
@@ -881,6 +936,7 @@ const bots = [
   {
     name:'Pepe',
     elo:150,
+    group:'Beginner',
     avatar:'🐸',
     description:'A relaxed player who likes random moves.',
     quote:'Easy game.',
@@ -889,6 +945,7 @@ const bots = [
   {
     name:'Martin',
     elo:250,
+    group:'Beginner',
     avatar:'🎩',
     description:'Knows a few tricks but makes plenty of mistakes.',
     quote:'I have a strategy!',
@@ -897,6 +954,7 @@ const bots = [
   {
     name:'Elani',
     elo:400,
+    group:'Beginner',
     avatar:'⭐',
     description:'Learning openings and trying to improve.',
     quote:'Lets see what happens.',
@@ -905,6 +963,7 @@ const bots = [
   {
     name:'Janjay',
     elo:700,
+    group:'Intermediate',
     avatar:'🎮',
     description:'A decent player who likes attacking.',
     quote:'Ready for a challenge?',
@@ -913,6 +972,7 @@ const bots = [
   {
     name:'Maria',
     elo:1000,
+    group:'Intermediate',
     avatar:'🌷',
     description:'A balanced player who enjoys tactical positions.',
     quote:'Think carefully!',
@@ -921,26 +981,29 @@ const bots = [
   {
     name:'Nelson',
     elo:1300,
+    group:'Intermediate',
     avatar:'🧑‍💻',
     description:'Experienced and fairly consistent.',
     quote:'This should be interesting.',
     strength:1300
   },
   {
-    name:'Magnus Carlsen',
-    elo:2882,
-    avatar:'♟',
-    description:'The legendary grandmaster. The toughest opponent.',
-    quote:'Good luck. You will need it.',
-    strength:2882
-  },
-  {
     name:'Jaylen Brown',
     elo:1500,
+    group:'Intermediate',
     avatar:'🏀',
     description:'A competitive player who likes aggressive chess.',
     quote:'Lets get this game started!',
     strength:1500
+  },
+  {
+    name:'Magnus Carlsen',
+    elo:2882,
+    group:'Master',
+    avatar:'♟',
+    description:'The legendary grandmaster. The toughest opponent.',
+    quote:'Good luck. You will need it.',
+    strength:2882
   }
 ];
 
@@ -998,9 +1061,10 @@ const dialogue = {
 
 let screenHistory = ['boot'];
 
-let selectedBot = null;
+let selectedBot = 0;
 let game = null;
 let mode = 'bot';
+let phase = 'select';      // 'select' (picking a bot) or 'playing'
 let flipped = false;
 let selectedSquare = null;
 let pendingPromotion = null;
@@ -1042,17 +1106,19 @@ function renderScreen() {
   }
 }
 
+function stopBot() {
+  clearTimeout(botTimer);
+  botThinking=false;
+  pendingPromotion=null;
+  document.getElementById('promotion').style.display='none';
+}
+
 function goBack() {
   if(screenHistory.length<=1)return;
 
   const current=screenHistory.pop();
 
-  if(current==='game') {
-    clearTimeout(botTimer);
-    botThinking=false;
-    pendingPromotion=null;
-    document.getElementById('promotion').style.display='none';
-  }
+  if(current==='game')stopBot();
 
   renderScreen();
 }
@@ -1072,6 +1138,24 @@ function loadProfile(img,name,fallback) {
   };
 
   img.src='Resources/Bots/Profiles/'+file+'.png';
+}
+
+function makeAvatar(bot) {
+  const wrap=document.createElement('div');
+  wrap.className='av';
+
+  const img=document.createElement('img');
+  img.alt=bot.name;
+  img.draggable=false;
+
+  const fallback=document.createElement('span');
+  fallback.textContent=bot.avatar;
+  fallback.style.display='none';
+
+  loadProfile(img,bot.name,fallback);
+  wrap.append(img,fallback);
+
+  return wrap;
 }
 
 /* =====================================
@@ -1114,122 +1198,156 @@ function renderHomeBoard() {
 }
 
 /* =====================================
-   BOT SELECTION
+   PLAY BOTS: SELECTION PANEL
 ===================================== */
 
-function renderBots() {
-  const grid=document.getElementById('botGrid');
-  grid.innerHTML='';
+function openBots() {
+  mode='bot';
+  showScreen('game');
+  enterSelect();
+}
 
-  bots.forEach((bot,index)=>{
-    const card=document.createElement('div');
+function enterSelect() {
+  stopBot();
 
-    card.className='bot-card'+
-      (selectedBot===index?' selected':'');
+  mode='bot';
+  phase='select';
+  game=new Chess();
+  flipped=false;
+  selectedSquare=null;
 
-    const cover=document.createElement('div');
-    cover.className='bot-cover';
+  document.getElementById('headingIcon').textContent='🤖';
+  document.getElementById('headingText').textContent='Play Bots';
+  document.getElementById('selectPanel').style.display='flex';
+  document.getElementById('gamePanel').style.display='none';
 
-    const img=document.createElement('img');
-    const fallback=document.createElement('div');
+  setTopPlayer();
+  renderSelect();
+  renderGame();
+}
 
-    fallback.className='bot-cover-fallback';
-    fallback.textContent=bot.avatar;
-    fallback.style.display='none';
+function renderSelect() {
+  const bot=bots[selectedBot];
 
-    loadProfile(img,bot.name,fallback);
+  const intro=document.getElementById('introAvatar');
+  intro.innerHTML='';
+  intro.appendChild(makeAvatar(bot));
 
-    cover.append(img,fallback);
+  document.getElementById('introSpeech').textContent=
+    "Hi, I'm "+bot.name+'! '+bot.quote;
+  document.getElementById('introName').textContent=bot.name;
+  document.getElementById('introElo').textContent=bot.elo.toLocaleString();
 
-    const details=document.createElement('div');
-    details.className='bot-details';
+  const container=document.getElementById('botGroups');
+  container.innerHTML='';
 
-    const name=document.createElement('div');
-    name.className='bot-name';
-    name.textContent=bot.name;
+  groups.forEach(group=>{
+    const members=bots
+      .map((b,i)=>({b,i}))
+      .filter(x=>x.b.group===group);
 
-    const elo=document.createElement('div');
-    elo.className='bot-elo';
-    elo.textContent=bot.elo.toLocaleString()+' Elo';
+    if(!members.length)return;
 
-    const description=document.createElement('div');
-    description.className='bot-description';
-    description.textContent=bot.description;
+    const box=document.createElement('div');
+    box.className='group';
 
-    const quote=document.createElement('div');
-    quote.className='bot-quote';
-    quote.textContent='"'+bot.quote+'"';
+    const head=document.createElement('div');
+    head.className='group-head';
+    head.innerHTML='<div></div><span></span>';
+    head.firstChild.textContent=group;
+    head.lastChild.textContent=members.length+(members.length===1?' bot':' bots');
 
-    details.append(name,elo,description,quote);
-    card.append(cover,details);
+    const grid=document.createElement('div');
+    grid.className='tile-grid';
 
-    card.onclick=()=>{
-      selectedBot=index;
-      renderBots();
+    members.forEach(({b,i})=>{
+      const tile=document.createElement('button');
+      tile.className='tile'+(i===selectedBot?' selected':'');
+      tile.title=b.name+' ('+b.elo.toLocaleString()+')';
+      tile.appendChild(makeAvatar(b));
 
-      document.getElementById('startBot').disabled=false;
-      document.getElementById('startBot').textContent='Play '+bot.name;
-    };
+      tile.onclick=()=>{
+        selectedBot=i;
+        setTopPlayer();
+        renderSelect();
+      };
 
-    grid.appendChild(card);
+      grid.appendChild(tile);
+    });
+
+    box.append(head,grid);
+    container.appendChild(box);
   });
 }
 
-renderBots();
+function setTopPlayer() {
+  const name=document.getElementById('blackName');
+  const elo=document.getElementById('blackElo');
+  const avatar=document.getElementById('blackAvatar');
+
+  avatar.innerHTML='';
+
+  if(mode==='bot') {
+    const bot=bots[selectedBot];
+    name.textContent=bot.name;
+    elo.textContent='('+bot.elo.toLocaleString()+')';
+    avatar.appendChild(makeAvatar(bot));
+  } else {
+    name.textContent='Black';
+    elo.textContent='';
+    avatar.textContent='♟';
+  }
+}
 
 /* =====================================
    GAME START
 ===================================== */
 
 function startBotGame() {
-  if(selectedBot===null)return;
-
   mode='bot';
+  phase='playing';
 
   const bot=bots[selectedBot];
 
-  document.getElementById('blackName').textContent=bot.name;
-  document.getElementById('blackElo').textContent=
-    bot.elo.toLocaleString()+' Elo';
+  document.getElementById('headingIcon').textContent='🤖';
+  document.getElementById('headingText').textContent='Play Bots';
+  document.getElementById('selectPanel').style.display='none';
+  document.getElementById('gamePanel').style.display='flex';
+  document.getElementById('gameBotHead').style.display='flex';
 
-  const avatar=document.getElementById('blackAvatar');
+  const avatar=document.getElementById('gameBotAvatar');
   avatar.innerHTML='';
+  avatar.appendChild(makeAvatar(bot));
 
-  const img=document.createElement('img');
-  const fallback=document.createElement('span');
-  fallback.textContent=bot.avatar;
-  fallback.style.display='none';
-
-  loadProfile(img,bot.name,fallback);
-  avatar.append(img,fallback);
-
-  showScreen('game');
+  setTopPlayer();
   startGame();
 }
 
 function startPractice() {
   mode='practice';
-
-  document.getElementById('blackName').textContent='Black';
-  document.getElementById('blackElo').textContent='';
-  document.getElementById('blackAvatar').textContent='♟';
+  phase='playing';
 
   showScreen('game');
+
+  document.getElementById('headingIcon').textContent='♜';
+  document.getElementById('headingText').textContent='Practice';
+  document.getElementById('selectPanel').style.display='none';
+  document.getElementById('gamePanel').style.display='flex';
+  document.getElementById('gameBotHead').style.display='none';
+
+  setTopPlayer();
   startGame();
 }
 
 function startGame() {
-  clearTimeout(botTimer);
+  stopBot();
 
   game=new Chess();
   flipped=false;
   selectedSquare=null;
-  pendingPromotion=null;
-  botThinking=false;
   messageLast='';
 
   if(mode==='bot') {
-    const bot=bots[selectedBot];
     const messages=[
       'Lets play some chess!',
       'Ready for a game?',
@@ -1240,13 +1358,20 @@ function startGame() {
       'Hope youre ready!'
     ];
 
-    setMessage(bot.name+': '+
-      messages[Math.floor(Math.random()*messages.length)]);
+    setMessage(messages[Math.floor(Math.random()*messages.length)]);
   } else {
     setMessage('Practice mode. Play both sides at your own pace.');
   }
 
   renderGame();
+}
+
+function leaveGame() {
+  if(mode==='bot') {
+    enterSelect();
+  } else {
+    goBack();
+  }
 }
 
 /* =====================================
@@ -1379,6 +1504,7 @@ function updateStatus() {
 ===================================== */
 
 function clickSquare(square) {
+  if(phase!=='playing')return;
   if(game.game_over()||botThinking||pendingPromotion)return;
 
   if(mode==='bot'&&game.turn()==='b')return;
@@ -1651,6 +1777,8 @@ function finishGame() {
   clearTimeout(botTimer);
   renderGame();
 
+  if(mode!=='bot')return;
+
   if(game.in_checkmate()) {
     if(game.turn()==='w') {
       randomLine('win');
@@ -1687,7 +1815,7 @@ document.getElementById('flip').onclick=()=>{
 };
 
 document.getElementById('restart').onclick=()=>{
-  if(game)startGame();
+  if(game&&phase==='playing')startGame();
 };
 
 /* =====================================
