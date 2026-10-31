@@ -3,8 +3,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Chess</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap');
 
@@ -13,9 +16,11 @@
   --dark: rgb(118,149,86);
   --light: #eaedd1;
   --panel: #262421;
-  --text: #e8e6e3;
+  --panel2: #302e2b;
+  --text: #eee;
   --muted: #aaa69f;
-  --blue: #81b64c;
+  --green: #81b64c;
+  --red: #e05252;
 }
 
 * {
@@ -26,30 +31,365 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Google Sans', Arial, sans-serif;
+  font-family: 'Google Sans',Arial,sans-serif;
   min-height: 100vh;
 }
 
-header {
-  height: 64px;
-  background: #262421;
+button {
+  font-family: inherit;
+}
+
+/* GENERAL */
+
+.screen {
+  display: none;
+  min-height: 100vh;
+}
+
+.screen.active {
+  display: block;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* BOOT SCREEN */
+
+#boot {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 28px 38px;
+}
+
+.boot-logo {
+  width: 150px;
+  max-height: 65px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.boot-content {
+  flex: 1;
   display: flex;
   align-items: center;
-  padding: 0 25px;
-  border-bottom: 1px solid #393631;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  gap: 20px;
 }
 
-.logo {
+.boot-board {
+  width: min(280px,65vw);
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(8,1fr);
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+.boot-square:nth-child(16n+1),
+.boot-square:nth-child(16n+3),
+.boot-square:nth-child(16n+5),
+.boot-square:nth-child(16n+7),
+.boot-square:nth-child(16n+10),
+.boot-square:nth-child(16n+12),
+.boot-square:nth-child(16n+14),
+.boot-square:nth-child(16n+16) {
+  background: var(--dark);
+}
+
+.boot-square {
+  background: var(--light);
+}
+
+.boot-content h1 {
+  font-size: clamp(32px,5vw,48px);
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+}
+
+.boot-content p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 15px;
+}
+
+.get-started {
+  width: 230px;
+  height: 55px;
+  border: none;
+  border-radius: 5px;
+  background: var(--green);
+  color: white;
+  font-size: 17px;
+  font-weight: 700;
+  transition: background .2s,transform .2s;
+}
+
+.get-started:hover {
+  background: #91c75a;
+  transform: translateY(-2px);
+}
+
+/* HEADER */
+
+header {
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  background: #262421;
+  border-bottom: 1px solid #3b3935;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.header-logo {
+  width: 115px;
+  max-height: 45px;
+  object-fit: contain;
+}
+
+.header-logo-fallback {
   font-size: 22px;
   font-weight: 700;
-  letter-spacing: -.7px;
+  display: none;
 }
 
-main {
-  width: min(1120px, 95%);
-  margin: 35px auto;
+.header-back {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.header-back:hover {
+  color: white;
+}
+
+/* HOME */
+
+.home-layout {
+  max-width: 1100px;
+  width: 94%;
+  margin: 55px auto;
   display: grid;
-  grid-template-columns: minmax(0, 650px) minmax(250px, 340px);
+  grid-template-columns: minmax(0,600px) minmax(250px,350px);
+  align-items: center;
+  gap: 55px;
+}
+
+.home-board-wrap {
+  width: 100%;
+  max-width: 580px;
+}
+
+.home-board {
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(8,1fr);
+  overflow: hidden;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.home-board img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.home-square {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-square.light { background: var(--light); }
+.home-square.dark { background: var(--dark); }
+
+.home-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.home-title {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin: 0 0 5px;
+}
+
+.home-subtitle {
+  color: var(--muted);
+  margin: 0 0 20px;
+  font-size: 14px;
+}
+
+.menu-button {
+  width: 100%;
+  height: 65px;
+  border: 1px solid #45413b;
+  border-radius: 5px;
+  background: #262421;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 17px;
+  gap: 15px;
+  text-align: left;
+  transition: background .15s,border .15s;
+}
+
+.menu-button:hover {
+  background: #37342f;
+  border-color: #69645b;
+}
+
+.menu-icon {
+  font-size: 25px;
+  width: 32px;
+  text-align: center;
+}
+
+.menu-label {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.menu-description {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* BOTS */
+
+.page-container {
+  max-width: 1050px;
+  width: 94%;
+  margin: 45px auto;
+}
+
+.page-title {
+  font-size: 30px;
+  margin: 0;
+  letter-spacing: -.8px;
+}
+
+.page-subtitle {
+  color: var(--muted);
+  margin: 9px 0 28px;
+  font-size: 14px;
+}
+
+.bot-grid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 13px;
+}
+
+.bot-card {
+  background: #262421;
+  border: 1px solid #3d3933;
+  border-radius: 6px;
+  padding: 17px;
+  min-height: 155px;
+  cursor: pointer;
+  transition: background .15s,border .15s;
+}
+
+.bot-card:hover {
+  background: #35322d;
+  border-color: #81b64c;
+}
+
+.bot-card.selected {
+  border: 2px solid var(--green);
+  background: #34392c;
+  padding: 16px;
+}
+
+.bot-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bot-avatar {
+  width: 45px;
+  height: 45px;
+  background: #413e37;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font-size: 27px;
+}
+
+.bot-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.bot-elo {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.bot-description {
+  font-size: 12px;
+  color: #b9b4aa;
+  margin-top: 15px;
+  line-height: 1.5;
+}
+
+.bot-quote {
+  color: #a8c982;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.bot-bottom {
+  margin-top: 25px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.start-bot {
+  height: 48px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 0 28px;
+}
+
+.start-bot:hover {
+  background: #91c75a;
+}
+
+/* GAME */
+
+.game-layout {
+  width: min(1100px,95%);
+  margin: 30px auto;
+  display: grid;
+  grid-template-columns: minmax(0,650px) minmax(250px,330px);
   gap: 25px;
   align-items: start;
 }
@@ -59,19 +399,19 @@ main {
 }
 
 .player {
-  height: 48px;
+  height: 49px;
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 31px;
+  height: 31px;
+  background: #44413b;
   border-radius: 5px;
-  background: #44413c;
   display: grid;
   place-items: center;
   font-size: 19px;
@@ -149,42 +489,39 @@ main {
   overflow: hidden;
 }
 
-.tabs {
-  display: flex;
-  height: 55px;
+.sidebar-heading {
+  padding: 17px;
   border-bottom: 1px solid #3b3935;
-}
-
-.tab {
-  flex: 1;
-  background: none;
-  border: none;
-  color: var(--muted);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.tab.active {
-  color: white;
-  border-bottom: 3px solid var(--blue);
+  font-weight: 700;
+  font-size: 15px;
 }
 
 .game-info {
-  padding: 18px;
+  padding: 17px;
 }
 
 .status {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 16px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.bot-message {
+  padding: 12px;
+  background: #34312c;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #ddd8cf;
+  min-height: 52px;
 }
 
 .moves {
   background: #201f1c;
   border-radius: 4px;
-  min-height: 170px;
-  max-height: 330px;
+  min-height: 150px;
+  max-height: 270px;
   overflow-y: auto;
   padding: 8px;
 }
@@ -201,36 +538,27 @@ main {
   background: #292722;
 }
 
-.move-number {
-  color: #99948c;
-}
-
-.move {
-  font-weight: 500;
-}
+.move-number { color: #99948c; }
+.move { font-weight: 500; }
 
 .controls {
   display: grid;
   grid-template-columns: repeat(3,1fr);
   gap: 8px;
-  margin-top: 15px;
+  margin-top: 14px;
 }
 
-.controls button, .action-button {
-  height: 43px;
+.controls button {
+  height: 42px;
   border: none;
   border-radius: 4px;
   background: #45423c;
   color: white;
-  font: inherit;
+  font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
-  transition: background .15s;
 }
 
-.controls button:hover, .action-button:hover {
-  background: #57534b;
-}
+.controls button:hover { background: #57534b; }
 
 .controls button:disabled {
   opacity: .35;
@@ -239,14 +567,19 @@ main {
 
 .action-button {
   width: 100%;
+  height: 44px;
   margin-top: 10px;
-  background: #81b64c;
-  color: #fff;
+  background: var(--green);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
 }
 
-.action-button:hover {
-  background: #729f43;
-}
+.action-button:hover { background: #91c75a; }
+
+/* PROMOTION */
 
 .promotion {
   position: fixed;
@@ -272,607 +605,755 @@ main {
   border-radius: 5px;
   width: 65px;
   height: 65px;
-  cursor: pointer;
 }
+
+.promotion-box button:hover { background: #5b574e; }
 
 .promotion-box img {
   width: 100%;
 }
 
-@media(max-width:800px) {
-  main {
+/* TOAST */
+
+.toast {
+  position: fixed;
+  top: 85px;
+  left: 50%;
+  transform: translate(-50%,-15px);
+  opacity: 0;
+  pointer-events: none;
+  background: #a93636;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 30;
+  transition: opacity .2s,transform .2s;
+  text-align: center;
+  width: max-content;
+  max-width: 90%;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%,0);
+}
+
+/* RESPONSIVE */
+
+@media(max-width:850px) {
+  .home-layout {
+    grid-template-columns: minmax(0,1fr);
+    max-width: 550px;
+    margin: 25px auto;
+    gap: 25px;
+  }
+
+  .home-menu { width: 100%; }
+  .home-title { font-size: 27px; }
+
+  .game-layout {
     display: flex;
     flex-direction: column;
-    width: min(100%, 620px);
+    max-width: 620px;
     margin: 15px auto;
-    gap: 15px;
   }
 
   .sidebar { width: 100%; }
-  header { height: 55px; }
+}
+
+@media(max-width:650px) {
+  header { padding: 0 15px; }
+  #boot { padding: 20px; }
+  .page-container { margin: 25px auto; }
+  .bot-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .page-title { font-size: 26px; }
+  .game-layout { width: 100%; }
+  .board-area { padding: 0 7px; }
+  .player { padding: 0 7px; }
+  .sidebar { border-radius: 0; }
+}
+
+@media(max-width:390px) {
+  .bot-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
+
 <body>
 
-<header>
-  <div class="logo">Chess</div>
+<!-- BOOT SCREEN -->
+
+<section id="boot" class="screen active">
+  <img src="Resources/logo.png" class="boot-logo" alt="Logo"
+       onerror="this.style.display='none';document.getElementById('bootFallback').style.display='block'">
+
+  <div id="bootFallback" class="header-logo-fallback" style="display:none">Chess</div>
+
+  <div class="boot-content">
+    <div class="boot-board" id="bootBoard"></div>
+    <h1>Chess.</h1>
+    <p>A better place to play chess.</p>
+    <button class="get-started" onclick="showScreen('home')">Get Started</button>
+  </div>
+</section>
+
+<!-- HEADER -->
+
+<header id="header" style="display:none">
+  <div class="header-left">
+    <button class="header-back" onclick="goBack()">← Back</button>
+    <img src="Resources/logo.png" class="header-logo" alt="Chess"
+         onerror="this.style.display='none';document.getElementById('headerFallback').style.display='block'">
+    <span class="header-logo-fallback" id="headerFallback">Chess</span>
+  </div>
 </header>
 
-<main>
-  <section class="board-area">
-    <div class="player">
-      <div class="avatar">♟</div>
-      <span>Black</span>
-    </div>
-    <div class="board" id="board"></div>
-    <div class="player">
-      <div class="avatar">♙</div>
-      <span>White</span>
-    </div>
-  </section>
+<!-- HOME -->
 
-  <aside class="sidebar">
-    <div class="tabs">
-      <button class="tab active">Play</button>
-      <button class="tab">Moves</button>
-    </div>
-    <div class="game-info">
-      <div class="status" id="status">White to move</div>
-      <div class="moves" id="moves"></div>
+<section id="home" class="screen">
+  <div class="home-layout">
 
-      <div class="controls">
-        <button id="undo">↶ Undo</button>
-        <button id="flip">⇅ Flip</button>
-        <button id="restart">↻ Restart</button>
+    <div class="home-board-wrap">
+      <div class="home-board" id="homeBoard"></div>
+    </div>
+
+    <div class="home-menu">
+      <h1 class="home-title">Play Chess</h1>
+      <p class="home-subtitle">Choose how you want to play.</p>
+
+      <button class="menu-button" onclick="showScreen('bots')">
+        <span class="menu-icon">♟</span>
+        <span>
+          <div class="menu-label">Play Bots</div>
+          <div class="menu-description">Play against computer opponents</div>
+        </span>
+      </button>
+
+      <button class="menu-button" onclick="onlineUnavailable()">
+        <span class="menu-icon">♟</span>
+        <span>
+          <div class="menu-label">Play Online</div>
+          <div class="menu-description">Challenge other players</div>
+        </span>
+      </button>
+
+      <button class="menu-button" onclick="startPractice()">
+        <span class="menu-icon">♜</span>
+        <span>
+          <div class="menu-label">Practice</div>
+          <div class="menu-description">Play both sides and practice</div>
+        </span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- BOT SELECTION -->
+
+<section id="bots" class="screen">
+  <div class="page-container">
+    <h1 class="page-title">Choose your opponent</h1>
+    <p class="page-subtitle">Every opponent has their own personality and playing strength.</p>
+
+    <div class="bot-grid" id="botGrid"></div>
+
+    <div class="bot-bottom">
+      <button class="start-bot" onclick="startBotGame()" id="startBot" disabled>
+        Choose an opponent
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- GAME -->
+
+<section id="game" class="screen">
+  <div class="game-layout">
+
+    <div class="board-area">
+      <div class="player">
+        <div class="avatar" id="blackAvatar">♟</div>
+        <span id="blackName">Black</span>
+        <span id="blackElo" style="color:var(--muted);font-size:12px"></span>
       </div>
 
-      <button class="action-button" id="newgame">New game</button>
+      <div class="board" id="board"></div>
+
+      <div class="player">
+        <div class="avatar">♙</div>
+        <span>You</span>
+      </div>
     </div>
-  </aside>
-</main>
+
+    <aside class="sidebar">
+      <div class="sidebar-heading">Game</div>
+
+      <div class="game-info">
+        <div class="status" id="status">White to move</div>
+
+        <div class="bot-message" id="botMessage">
+          Let's play some chess!
+        </div>
+
+        <div class="moves" id="moves"></div>
+
+        <div class="controls">
+          <button id="undo">↶ Undo</button>
+          <button id="flip">⇅ Flip</button>
+          <button id="restart">↻ Restart</button>
+        </div>
+
+        <button class="action-button" onclick="goBack()">Leave game</button>
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+<!-- PROMOTION -->
 
 <div class="promotion" id="promotion">
   <div class="promotion-box" id="promotionChoices"></div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-const boardElement = document.getElementById('board');
-const movesElement = document.getElementById('moves');
-const statusElement = document.getElementById('status');
+/* ==================================
+   CONFIGURATION
+================================== */
 
 const piecePaths = {
   w: 'Resources/Pieces/White/',
   b: 'Resources/Pieces/Black/'
 };
 
-const pieceNames = {
-  K:'k', Q:'q', R:'r', B:'b', N:'n', P:'p',
-  k:'k', q:'q', r:'r', b:'b', n:'n', p:'p'
+const pieceLetters = {
+  p:'p', n:'n', b:'b', r:'r', q:'q', k:'k'
 };
 
-const initialBoard = [
-  'rnbqkbnr',
-  'pppppppp',
-  '........',
-  '........',
-  '........',
-  '........',
-  'PPPPPPPP',
-  'RNBQKBNR'
-].join('');
+const bots = [
+  {
+    name:'Julian',
+    elo:500,
+    avatar:'🧑‍💻',
+    description:'A beginner who enjoys playing chess.',
+    quote:'Lets play some Chess!',
+    strength:500
+  },
+  {
+    name:'Oliver',
+    elo:650,
+    avatar:'👨‍🎓',
+    description:'Still learning, but knows a few tricks.',
+    quote:'I hope I remember my openings.',
+    strength:650
+  },
+  {
+    name:'Max',
+    elo:800,
+    avatar:'🧢',
+    description:'Likes aggressive moves and quick attacks.',
+    quote:'You ready? I am.',
+    strength:800
+  },
+  {
+    name:'Sophia',
+    elo:1000,
+    avatar:'👩‍💻',
+    description:'A balanced player who likes strategy.',
+    quote:'Lets see what you have.',
+    strength:1000
+  },
+  {
+    name:'Daniel',
+    elo:1200,
+    avatar:'🧑‍🎨',
+    description:'Good at tactics, sometimes gets impatient.',
+    quote:'I have a plan.',
+    strength:1200
+  },
+  {
+    name:'Alex',
+    elo:1400,
+    avatar:'🕶️',
+    description:'A strong opponent with a competitive style.',
+    quote:'This should be interesting.',
+    strength:1400
+  },
+  {
+    name:'Emma',
+    elo:1600,
+    avatar:'👩‍🏫',
+    description:'Careful with positioning and development.',
+    quote:'Think carefully about your moves.',
+    strength:1600
+  },
+  {
+    name:'Lucas',
+    elo:1800,
+    avatar:'🎮',
+    description:'An experienced player who likes complex positions.',
+    quote:'Good luck. You might need it.',
+    strength:1800
+  },
+  {
+    name:'Morgan',
+    elo:2000,
+    avatar:'🧠',
+    description:'A very strong strategic opponent.',
+    quote:'Lets have a good game.',
+    strength:2000
+  }
+];
 
-let position;
-let turn;
-let selected = -1;
-let history = [];
-let moveHistory = [];
-let lastMove = null;
+const dialogue = {
+  start:[
+    "Let's play some chess!",
+    "Good luck!",
+    "Ready when you are.",
+    "I hope this is a good game.",
+    "Let's see how this goes.",
+    "Your move!",
+    "I've been practicing."
+  ],
+  thinking:[
+    "Hmm, interesting.",
+    "Let me think about that.",
+    "I wasn't expecting that.",
+    "Nice move!",
+    "Interesting position.",
+    "I have an idea.",
+    "Let's see...",
+    "That's a clever move.",
+    "Not bad!",
+    "Okay, my turn."
+  ],
+  capture:[
+    "Gotcha!",
+    "I'll take that.",
+    "A little trade.",
+    "Thanks for the piece.",
+    "Interesting trade."
+  ],
+  mistake:[
+    "Oops. That might not have been right.",
+    "I should have thought longer.",
+    "Hmm, questionable move.",
+    "Let's pretend that was intentional.",
+    "I may have made a mistake."
+  ],
+  check:[
+    "Check!",
+    "Watch your king!",
+    "Your king is in trouble."
+  ],
+  win:[
+    "Good game!",
+    "That was fun!",
+    "Well played!",
+    "Nice try!",
+    "GG!"
+  ],
+  lose:[
+    "Well played!",
+    "You got me!",
+    "I need more practice.",
+    "Good game!",
+    "Rematch sometime?"
+  ]
+};
+
+let selectedBot = null;
+let game = null;
+let mode = 'bot';
 let flipped = false;
+let selectedSquare = null;
 let pendingPromotion = null;
-let gameOver = false;
+let botThinking = false;
+let botTimer = null;
+let toastTimer = null;
+let lastMove = null;
+let messageLast = '';
 
-function initialState() {
-  position = initialBoard.split('');
-  turn = 'w';
-  selected = -1;
-  history = [];
-  moveHistory = [];
-  lastMove = null;
-  pendingPromotion = null;
-  gameOver = false;
-  render();
-}
+/* ==================================
+   SCREEN NAVIGATION
+================================== */
 
-function color(piece) {
-  if (!piece || piece === '.') return null;
-  return piece === piece.toUpperCase() ? 'w' : 'b';
-}
-
-function type(piece) {
-  return piece.toLowerCase();
-}
-
-function squareName(i) {
-  return 'abcdefgh'[i % 8] + (8 - Math.floor(i / 8));
-}
-
-function inside(r,c) {
-  return r >= 0 && r < 8 && c >= 0 && c < 8;
-}
-
-function findKing(board, side) {
-  return board.indexOf(side === 'w' ? 'K' : 'k');
-}
-
-function attacked(board, target, by) {
-  const tr = Math.floor(target / 8);
-  const tc = target % 8;
-
-  for (let i=0;i<64;i++) {
-    const p = board[i];
-    if (p === '.' || color(p) !== by) continue;
-
-    const r = Math.floor(i/8);
-    const c = i%8;
-    const t = type(p);
-    const dr = tr-r;
-    const dc = tc-c;
-
-    if (t === 'p') {
-      const direction = by === 'w' ? -1 : 1;
-      if (dr === direction && Math.abs(dc) === 1) return true;
-      continue;
-    }
-
-    if (t === 'n') {
-      if ((Math.abs(dr)===2 && Math.abs(dc)===1) ||
-          (Math.abs(dr)===1 && Math.abs(dc)===2)) return true;
-      continue;
-    }
-
-    if (t === 'k') {
-      if (Math.max(Math.abs(dr),Math.abs(dc))===1) return true;
-      continue;
-    }
-
-    const diagonal = Math.abs(dr) === Math.abs(dc);
-    const straight = dr===0 || dc===0;
-
-    if ((t==='b' && !diagonal) ||
-        (t==='r' && !straight) ||
-        (t==='q' && !diagonal && !straight)) continue;
-
-    if (dr===0 && dc===0) continue;
-
-    const steps = Math.max(Math.abs(dr),Math.abs(dc));
-    const sr = Math.sign(dr);
-    const sc = Math.sign(dc);
-    let clear = true;
-
-    for(let n=1;n<steps;n++) {
-      if(board[(r+sr*n)*8+c+sc*n]!=='.') {
-        clear=false;
-        break;
-      }
-    }
-
-    if(clear) return true;
-  }
-
-  return false;
-}
-
-function inCheck(board, side) {
-  const king = findKing(board,side);
-  return king < 0 || attacked(board,king,side==='w'?'b':'w');
-}
-
-function pseudoMoves(board, from, ep, castle) {
-  const p = board[from];
-  const side = color(p);
-  const t = type(p);
-  const r = Math.floor(from/8);
-  const c = from%8;
-  const moves = [];
-
-  function add(to, extra={}) {
-    if (to < 0 || to >= 64) return;
-    if (color(board[to]) === side) return;
-    if (type(board[to]) === 'k') return;
-    moves.push({from,to,...extra});
-  }
-
-  if(t==='p') {
-    const d = side==='w'?-1:1;
-    const start = side==='w'?6:1;
-    const next = r+d;
-
-    if(inside(next,c) && board[next*8+c]==='.') {
-      add(next*8+c);
-      if(r===start && board[(r+2*d)*8+c]==='.') {
-        add((r+2*d)*8+c);
-      }
-    }
-
-    for(const dc of [-1,1]) {
-      const nr=r+d,nc=c+dc;
-      if(!inside(nr,nc))continue;
-      const to=nr*8+nc;
-
-      if(color(board[to])=== (side==='w'?'b':'w')) add(to);
-      else if(to===ep) add(to,{ep:true});
-    }
-  }
-
-  if(t==='n') {
-    for(const [dr,dc] of [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]) {
-      const nr=r+dr,nc=c+dc;
-      if(inside(nr,nc))add(nr*8+nc);
-    }
-  }
-
-  if(['b','r','q','k'].includes(t)) {
-    const dirs = [];
-    if(['b','q'].includes(t)) dirs.push([-1,-1],[-1,1],[1,-1],[1,1]);
-    if(['r','q'].includes(t)) dirs.push([-1,0],[1,0],[0,-1],[0,1]);
-    if(t==='k') dirs.push([-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]);
-
-    for(const [dr,dc] of dirs) {
-      for(let n=1;n<= (t==='k'?1:7);n++) {
-        const nr=r+dr*n,nc=c+dc*n;
-        if(!inside(nr,nc))break;
-        const to=nr*8+nc;
-        if(color(board[to])===side)break;
-        if(type(board[to])==='k')break;
-        add(to);
-        if(board[to]!=='.')break;
-      }
-    }
-
-    if(t==='k' && !inCheck(board,side)) {
-      const home=side==='w'?60:4;
-      if(from===home) {
-        const enemy=side==='w'?'b':'w';
-        const kingside=side==='w'?'K':'k';
-        const queenside=side==='w'?'Q':'q';
-
-        if(castle.includes(kingside) &&
-           board[home+1]==='.' && board[home+2]==='.' &&
-           board[home+3]===(side==='w'?'R':'r') &&
-           !attacked(board,home+1,enemy) &&
-           !attacked(board,home+2,enemy)) {
-          add(home+2,{castle:'K'});
-        }
-
-        if(castle.includes(queenside) &&
-           board[home-1]==='.' && board[home-2]==='.' &&
-           board[home-3]==='.' &&
-           board[home-4]===(side==='w'?'R':'r') &&
-           !attacked(board,home-1,enemy) &&
-           !attacked(board,home-2,enemy)) {
-          add(home-2,{castle:'Q'});
-        }
-      }
-    }
-  }
-
-  return moves;
-}
-
-function legalMoves(board,from,ep,castle) {
-  return pseudoMoves(board,from,ep,castle).filter(m=>{
-    const copy=board.slice();
-    copy[m.to]=copy[m.from];
-    copy[m.from]='.';
-    if(m.ep) copy[m.to+(turn==='w'?8:-8)]='.';
-    if(m.castle) {
-      const rookFrom=m.to>m.from?m.from+3:m.from-4;
-      const rookTo=m.to>m.from?m.from+1:m.from-1;
-      copy[rookTo]=copy[rookFrom];
-      copy[rookFrom]='.';
-    }
-    return !inCheck(copy,turn);
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>{
+    s.classList.remove('active');
   });
+
+  document.getElementById(id).classList.add('active');
+
+  document.getElementById('header').style.display =
+    id==='boot'?'none':'flex';
+
+  if(id==='home') renderHomeBoard();
 }
 
-function allLegal(board,side,ep,castle) {
-  const oldTurn=turn;
-  turn=side;
-  const result=[];
+function goBack() {
+  clearTimeout(botTimer);
+  botThinking=false;
+  pendingPromotion=null;
+  document.getElementById('promotion').style.display='none';
+  showScreen(mode==='practice'?'home':'bots');
+}
+
+/* ==================================
+   RANDOM DIALOGUE
+================================== */
+
+function randomLine(category) {
+  const lines=dialogue[category]||dialogue.thinking;
+  let available=lines.filter(x=>x!==messageLast);
+  if(!available.length)available=lines;
+
+  const line=available[Math.floor(Math.random()*available.length)];
+  messageLast=line;
+  document.getElementById('botMessage').textContent=line;
+}
+
+function setMessage(text) {
+  messageLast=text;
+  document.getElementById('botMessage').textContent=text;
+}
+
+/* ==================================
+   BOOT AND HOME BOARDS
+================================== */
+
+function createPreviewBoard(container,interactive=false) {
+  container.innerHTML='';
+
+  const backrank=['r','n','b','q','k','b','n','r'];
+
   for(let i=0;i<64;i++) {
-    if(color(board[i])!==side)continue;
-    result.push(...legalMoves(board,i,ep,castle));
-  }
-  turn=oldTurn;
-  return result;
-}
+    const row=Math.floor(i/8);
+    const col=i%8;
 
-let enPassant=-1;
-let castling='KQkq';
-let halfmove=0;
-let fullmove=1;
-let repetition={};
-
-function snapshot() {
-  return {
-    position:position.slice(),
-    turn,
-    enPassant,
-    castling,
-    halfmove,
-    fullmove,
-    lastMove:lastMove?{...lastMove}:null,
-    moveHistory:moveHistory.slice(),
-    gameOver,
-    repetition:{...repetition}
-  };
-}
-
-function restore(s) {
-  position=s.position.slice();
-  turn=s.turn;
-  enPassant=s.enPassant;
-  castling=s.castling;
-  halfmove=s.halfmove;
-  fullmove=s.fullmove;
-  lastMove=s.lastMove;
-  moveHistory=s.moveHistory.slice();
-  gameOver=s.gameOver;
-  repetition={...s.repetition};
-  selected=-1;
-  pendingPromotion=null;
-  render();
-}
-
-function positionKey() {
-  return position.join('')+' '+turn+' '+castling+' '+enPassant;
-}
-
-function san(move) {
-  const p=position[move.from];
-  const captured=position[move.to]!=='.'||move.ep;
-  if(move.castle) return move.castle==='K'?'O-O':'O-O-O';
-
-  let result=type(p)==='p'?(captured?squareName(move.from)[0]:''):p.toUpperCase();
-
-  if(type(p)!=='p') {
-    const alternatives=allLegal(position,turn,enPassant,castling)
-      .filter(m=>m.to===move.to&&m.from!==move.from&&
-        position[m.from]===p);
-
-    if(alternatives.length) {
-      const sameFile=alternatives.some(m=>m.from%8===move.from%8);
-      const sameRank=alternatives.some(m=>Math.floor(m.from/8)===Math.floor(move.from/8));
-      result+=!sameFile?squareName(move.from)[0]:!sameRank?squareName(move.from)[1]:squareName(move.from);
-    }
-  }
-
-  result+=(captured?'x':'')+squareName(move.to);
-  if(move.promotion)result+='='+move.promotion.toUpperCase();
-  return result;
-}
-
-function makeMove(move,promotion='q') {
-  if(gameOver)return;
-
-  history.push(snapshot());
-
-  const piece=position[move.from];
-  const captured=position[move.to];
-  const notation=san({...move,promotion:move.promotion||''});
-
-  position[move.to]=move.promotion?
-    (turn==='w'?promotion.toUpperCase():promotion):
-    piece;
-  position[move.from]='.';
-
-  if(move.ep) position[move.to+(turn==='w'?8:-8)]='.';
-
-  if(move.castle) {
-    const rookFrom=move.to>move.from?move.from+3:move.from-4;
-    const rookTo=move.to>move.from?move.from+1:move.from-1;
-    position[rookTo]=position[rookFrom];
-    position[rookFrom]='.';
-  }
-
-  if(piece==='K')castling=castling.replace(/[KQ]/g,'');
-  if(piece==='k')castling=castling.replace(/[kq]/g,'');
-
-  const rookRights={63:'K',56:'Q',7:'k',0:'q'};
-  if(rookRights[move.from])castling=castling.replace(rookRights[move.from],'');
-  if(rookRights[move.to])castling=castling.replace(rookRights[move.to],'');
-
-  enPassant=-1;
-  if(type(piece)==='p'&&Math.abs(move.to-move.from)===16) {
-    enPassant=(move.to+move.from)/2;
-  }
-
-  halfmove=type(piece)==='p'||captured!=='.'||move.ep?0:halfmove+1;
-  if(turn==='b')fullmove++;
-
-  lastMove={from:move.from,to:move.to};
-  turn=turn==='w'?'b':'w';
-
-  let text=notation;
-  const nextMoves=allLegal(position,turn,enPassant,castling);
-
-  if(inCheck(position,turn)) {
-    text+=nextMoves.length?' +':'#';
-  }
-
-  moveHistory.push({side:turn==='b'?'w':'b',text});
-  const key=positionKey();
-  repetition[key]=(repetition[key]||0)+1;
-
-  selected=-1;
-  pendingPromotion=null;
-
-  checkGame();
-  render();
-}
-
-function checkGame() {
-  const legal=allLegal(position,turn,enPassant,castling);
-  if(legal.length===0) {
-    gameOver=true;
-    statusElement.textContent=inCheck(position,turn)?
-      'Checkmate! '+(turn==='w'?'Black':'White')+' wins.':
-      'Draw by stalemate.';
-    return;
-  }
-
-  if(halfmove>=150) {
-    gameOver=true;
-    statusElement.textContent='Draw by 75-move rule.';
-    return;
-  }
-
-  if(repetition[positionKey()]>=5) {
-    gameOver=true;
-    statusElement.textContent='Draw by repetition.';
-    return;
-  }
-
-  const pieces=position.filter(p=>p!=='.'&&type(p)!=='k');
-  if(pieces.length===0||
-    (pieces.length===1&&['b','n'].includes(type(pieces[0])))) {
-    gameOver=true;
-    statusElement.textContent='Draw by insufficient material.';
-    return;
-  }
-
-  statusElement.textContent=(turn==='w'?'White':'Black')+
-    ' to move'+(inCheck(position,turn)?' · Check':'');
-}
-
-function render() {
-  boardElement.innerHTML='';
-
-  for(let display=0;display<64;display++) {
-    const i=flipped?63-display:display;
-    const r=Math.floor(i/8);
-    const c=i%8;
     const square=document.createElement('div');
+    square.className='home-square '+((row+col)%2===0?'light':'dark');
 
-    square.className='square '+((r+c)%2===0?'light':'dark');
+    let piece=null;
+    let side=null;
 
-    if(selected===i)square.classList.add('selected');
-    if(lastMove&&(lastMove.from===i||lastMove.to===i))square.classList.add('last');
+    if(row===0) {piece=backrank[col];side='b';}
+    if(row===1) {piece='p';side='b';}
+    if(row===6) {piece='p';side='w';}
+    if(row===7) {piece=backrank[col];side='w';}
 
-    const piece=position[i];
-
-    if(piece!=='.') {
+    if(piece) {
       const img=document.createElement('img');
-      const side=color(piece)==='w'?'White':'Black';
-      img.src=piecePaths[color(piece)]+color(piece)+pieceNames[piece]+'.png';
-      img.alt=piece;
+      img.src=piecePaths[side]+side+piece+'.png';
       img.draggable=false;
-      img.onerror=()=>{img.style.display='none';};
       square.appendChild(img);
     }
 
-    if(!gameOver&&selected!==-1) {
-      const possible=legalMoves(position,selected,enPassant,castling);
-      const target=possible.find(m=>m.to===i);
+    container.appendChild(square);
+  }
+}
 
-      if(target) {
-        const mark=document.createElement('div');
-        mark.className=position[i]==='.'&&!target.ep?'dot':'capture';
-        square.appendChild(mark);
-      }
+function renderHomeBoard() {
+  createPreviewBoard(document.getElementById('homeBoard'));
+}
+
+createPreviewBoard(document.getElementById('bootBoard'));
+
+/* ==================================
+   BOT SELECTION
+================================== */
+
+function renderBots() {
+  const grid=document.getElementById('botGrid');
+  grid.innerHTML='';
+
+  bots.forEach((bot,index)=>{
+    const card=document.createElement('div');
+    card.className='bot-card'+(selectedBot===index?' selected':'');
+
+    card.innerHTML=`
+      <div class="bot-top">
+        <div class="bot-avatar">${bot.avatar}</div>
+        <div>
+          <div class="bot-name">${bot.name}</div>
+          <div class="bot-elo">${bot.elo} Elo</div>
+        </div>
+      </div>
+      <div class="bot-description">${bot.description}</div>
+      <div class="bot-quote">"${bot.quote}"</div>
+    `;
+
+    card.onclick=()=>{
+      selectedBot=index;
+      renderBots();
+      document.getElementById('startBot').disabled=false;
+      document.getElementById('startBot').textContent='Play '+bot.name;
+    };
+
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('startBot').disabled=true;
+renderBots();
+
+/* ==================================
+   START GAMES
+================================== */
+
+function startBotGame() {
+  if(selectedBot===null)return;
+
+  mode='bot';
+  const bot=bots[selectedBot];
+
+  document.getElementById('blackName').textContent=bot.name;
+  document.getElementById('blackElo').textContent=bot.elo+' Elo';
+  document.getElementById('blackAvatar').textContent=bot.avatar;
+
+  startGame();
+}
+
+function startPractice() {
+  mode='practice';
+  document.getElementById('blackName').textContent='Black';
+  document.getElementById('blackElo').textContent='';
+  document.getElementById('blackAvatar').textContent='♟';
+
+  startGame();
+}
+
+function startGame() {
+  clearTimeout(botTimer);
+
+  game=new Chess();
+  flipped=false;
+  selectedSquare=null;
+  pendingPromotion=null;
+  botThinking=false;
+  lastMove=null;
+  messageLast='';
+
+  setMessage(mode==='bot'?
+    randomStartMessage():
+    'Practice mode. Play both sides at your own pace.'
+  );
+
+  showScreen('game');
+  renderGame();
+}
+
+function randomStartMessage() {
+  const bot=bots[selectedBot];
+  const messages=[
+    "Let's play some chess!",
+    "Ready for a game?",
+    "Good luck! You'll need it.",
+    "I've been waiting for a match.",
+    "Let's see who wins this one.",
+    "Your move!",
+    "Hope you're ready!"
+  ];
+  return bot.name+': '+messages[Math.floor(Math.random()*messages.length)];
+}
+
+/* ==================================
+   BOARD
+================================== */
+
+function squareName(row,col) {
+  return 'abcdefgh'[col]+(8-row);
+}
+
+function renderGame() {
+  const boardElement=document.getElementById('board');
+  boardElement.innerHTML='';
+
+  const board=game.board();
+  const legal=selectedSquare?
+    game.moves({square:selectedSquare,verbose:true}):[];
+
+  const destinations=legal.map(m=>m.to);
+  const last=game.history({verbose:true});
+  lastMove=last.length?last[last.length-1]:null;
+
+  for(let display=0;display<64;display++) {
+    const i=flipped?63-display:display;
+    const row=Math.floor(i/8);
+    const col=i%8;
+    const square=document.createElement('div');
+
+    square.className='square '+((row+col)%2===0?'light':'dark');
+
+    const name=squareName(row,col);
+    const piece=board[row][col];
+
+    if(selectedSquare===name)square.classList.add('selected');
+
+    if(lastMove&&(lastMove.from===name||lastMove.to===name)) {
+      square.classList.add('last');
     }
 
-    if(c===0) {
+    if(piece) {
+      const img=document.createElement('img');
+      img.src=piecePaths[piece.color]+piece.color+pieceLetters[piece.type]+'.png';
+      img.alt=piece.color+piece.type;
+      img.draggable=false;
+      square.appendChild(img);
+    }
+
+    if(destinations.includes(name)) {
+      const marker=document.createElement('div');
+      marker.className=piece?'capture':'dot';
+      square.appendChild(marker);
+    }
+
+    if(col===0) {
       const rank=document.createElement('span');
       rank.className='coordinates rank';
-      rank.textContent=8-r;
+      rank.textContent=8-row;
       square.appendChild(rank);
     }
 
-    if(r===7) {
+    if(row===7) {
       const file=document.createElement('span');
       file.className='coordinates file';
-      file.textContent='abcdefgh'[c];
+      file.textContent='abcdefgh'[col];
       square.appendChild(file);
     }
 
-    square.addEventListener('click',()=>clickSquare(i));
+    square.addEventListener('click',()=>clickSquare(name));
     boardElement.appendChild(square);
   }
 
   renderMoves();
-  if(!gameOver) {
-    statusElement.textContent=(turn==='w'?'White':'Black')+
-      ' to move'+(inCheck(position,turn)?' · Check':'');
-  }
-
-  document.getElementById('undo').disabled=history.length===0;
+  updateStatus();
+  document.getElementById('undo').disabled=game.history().length===0;
 }
 
 function renderMoves() {
-  movesElement.innerHTML='';
+  const element=document.getElementById('moves');
+  const history=game.history();
+  element.innerHTML='';
 
-  for(let i=0;i<moveHistory.length;i+=2) {
+  for(let i=0;i<history.length;i+=2) {
     const row=document.createElement('div');
     row.className='move-row';
 
     const number=document.createElement('span');
     number.className='move-number';
-    number.textContent=(i/2+1)+'.';
+    number.textContent=(Math.floor(i/2)+1)+'.';
 
     const white=document.createElement('span');
     white.className='move';
-    white.textContent=moveHistory[i]?.text||'';
+    white.textContent=history[i]||'';
 
     const black=document.createElement('span');
     black.className='move';
-    black.textContent=moveHistory[i+1]?.text||'';
+    black.textContent=history[i+1]||'';
 
     row.append(number,white,black);
-    movesElement.appendChild(row);
+    element.appendChild(row);
   }
 
-  movesElement.scrollTop=movesElement.scrollHeight;
+  element.scrollTop=element.scrollHeight;
 }
 
-function clickSquare(i) {
-  if(gameOver||pendingPromotion)return;
+function updateStatus() {
+  const status=document.getElementById('status');
 
-  const piece=position[i];
+  if(game.in_checkmate()) {
+    status.textContent='Checkmate! '+(game.turn()==='w'?'Black':'White')+' wins.';
+  } else if(game.in_stalemate()) {
+    status.textContent='Draw by stalemate.';
+  } else if(game.in_draw()) {
+    status.textContent='Game drawn.';
+  } else if(game.in_check()) {
+    status.textContent=(game.turn()==='w'?'White':'Black')+' to move · Check';
+  } else {
+    status.textContent=(game.turn()==='w'?'White':'Black')+' to move';
+  }
+}
 
-  if(selected===-1) {
-    if(color(piece)===turn) {
-      selected=i;
-      render();
+/* ==================================
+   PLAYER MOVES
+================================== */
+
+function clickSquare(square) {
+  if(game.game_over()||botThinking||pendingPromotion)return;
+
+  if(mode==='bot'&&game.turn()==='b')return;
+
+  const piece=game.get(square);
+
+  if(!selectedSquare) {
+    if(piece&&piece.color===game.turn()) {
+      selectedSquare=square;
+      renderGame();
     }
     return;
   }
 
-  if(color(piece)===turn) {
-    selected=i;
-    render();
+  if(piece&&piece.color===game.turn()) {
+    selectedSquare=square;
+    renderGame();
     return;
   }
 
-  const move=legalMoves(position,selected,enPassant,castling)
-    .find(m=>m.to===i);
+  const possible=game.moves({
+    square:selectedSquare,
+    verbose:true
+  }).filter(m=>m.to===square);
 
-  if(!move) {
-    selected=-1;
-    render();
+  if(!possible.length) {
+    selectedSquare=null;
+    renderGame();
     return;
   }
 
-  if(type(position[selected])==='p'&&
-    (Math.floor(i/8)===0||Math.floor(i/8)===7)) {
-    pendingPromotion=move;
+  const move=possible[0];
+
+  if(move.flags.includes('p')) {
+    pendingPromotion={from:selectedSquare,to:square};
+    selectedSquare=null;
     showPromotion();
     return;
   }
 
-  makeMove(move);
+  makePlayerMove({
+    from:selectedSquare,
+    to:square
+  });
 }
+
+function makePlayerMove(move) {
+  try {
+    game.move({...move,promotion:'q'});
+  } catch(e) {
+    return;
+  }
+
+  selectedSquare=null;
+  renderGame();
+
+  if(game.game_over()) {
+    finishGame();
+    return;
+  }
+
+  if(mode==='bot') {
+    randomLine('thinking');
+    scheduleBot();
+  }
+}
+
+/* ==================================
+   PROMOTION
+================================== */
 
 function showPromotion() {
   const box=document.getElementById('promotion');
@@ -882,32 +1363,237 @@ function showPromotion() {
   for(const p of ['q','r','b','n']) {
     const btn=document.createElement('button');
     const img=document.createElement('img');
-    const side=turn==='w'?'w':'b';
-    img.src=piecePaths[side==='w'?'White':'Black']+side+p+'.png';
+    const side=game.turn();
+
+    img.src=piecePaths[side]+side+p+'.png';
     btn.appendChild(img);
+
     btn.onclick=()=>{
       box.style.display='none';
-      makeMove({...pendingPromotion,promotion:p});
+
+      const move=pendingPromotion;
+      pendingPromotion=null;
+
+      makePlayerMove({
+        ...move,
+        promotion:p
+      });
     };
+
     choices.appendChild(btn);
   }
 
   box.style.display='flex';
 }
 
+/* ==================================
+   BOT BRAIN
+================================== */
+
+const pieceValues={
+  p:100,
+  n:310,
+  b:330,
+  r:500,
+  q:900,
+  k:20000
+};
+
+function evaluateMove(move,botColor) {
+  let score=0;
+
+  const piece=game.get(move.from);
+  const captured=game.get(move.to);
+
+  if(captured) {
+    score+=pieceValues[captured.type]*0.9;
+    score-=pieceValues[piece.type]*0.04;
+  }
+
+  if(move.flags.includes('p'))score+=850;
+
+  if(move.san.includes('+'))score+=45;
+  if(move.san.includes('#'))score+=50000;
+
+  const col='abcdefgh'.indexOf(move.to[0]);
+  const row=Number(move.to[1])-1;
+
+  const centerDistance=Math.abs(3.5-col)+Math.abs(3.5-row);
+  score+=(7-centerDistance)*3;
+
+  if(piece.type==='n'||piece.type==='b') {
+    const homeRank=botColor==='b'?8:1;
+    if(Number(move.from[1])===homeRank)score+=10;
+  }
+
+  if(move.san==='O-O'||move.san==='O-O-O')score+=35;
+
+  score+=Math.random()*18;
+
+  return score;
+}
+
+function botDifficulty(bot) {
+  const strength=bot.strength;
+
+  if(strength<=600)return 0.65;
+  if(strength<=800)return 0.54;
+  if(strength<=1000)return 0.43;
+  if(strength<=1200)return 0.34;
+  if(strength<=1400)return 0.26;
+  if(strength<=1600)return 0.20;
+  if(strength<=1800)return 0.15;
+  return 0.12;
+}
+
+function chooseBotMove() {
+  const moves=game.moves({verbose:true});
+
+  if(!moves.length)return null;
+
+  const bot=bots[selectedBot];
+  const mistakeChance=botDifficulty(bot);
+
+  const evaluated=moves.map(move=>({
+    move,
+    score:evaluateMove(move,'b')
+  }));
+
+  evaluated.sort((a,b)=>b.score-a.score);
+
+  // Occasionally choose a less accurate move.
+  if(Math.random()<mistakeChance) {
+    const options=evaluated.slice(
+      Math.max(0,Math.floor(evaluated.length*0.35))
+    );
+
+    return options[Math.floor(Math.random()*options.length)].move;
+  }
+
+  // Weaker bots consider fewer good candidate moves.
+  const candidateCount=bot.strength<700?4:
+    bot.strength<1000?3:
+    bot.strength<1400?2:2;
+
+  const candidates=evaluated.slice(0,candidateCount);
+  return candidates[Math.floor(Math.random()*candidates.length)].move;
+}
+
+function scheduleBot() {
+  if(game.game_over())return;
+
+  botThinking=true;
+
+  botTimer=setTimeout(()=>{
+    if(game.game_over()) {
+      botThinking=false;
+      return;
+    }
+
+    const move=chooseBotMove();
+
+    if(!move) {
+      botThinking=false;
+      return;
+    }
+
+    const bot=bots[selectedBot];
+
+    try {
+      game.move({
+        from:move.from,
+        to:move.to,
+        promotion:'q'
+      });
+    } catch(e) {
+      botThinking=false;
+      return;
+    }
+
+    botThinking=false;
+    selectedSquare=null;
+    renderGame();
+
+    if(game.game_over()) {
+      finishGame();
+      return;
+    }
+
+    if(game.in_check()) {
+      randomLine('check');
+    } else if(Math.random()<0.3) {
+      randomLine(move.captured?'capture':'thinking');
+    }
+
+  },900+Math.random()*900);
+}
+
+/* ==================================
+   END GAME
+================================== */
+
+function finishGame() {
+  botThinking=false;
+  clearTimeout(botTimer);
+  renderGame();
+
+  if(game.in_checkmate()) {
+    if(game.turn()==='w') {
+      setMessage('You lost! '+dialogue.win[Math.floor(Math.random()*dialogue.win.length)]);
+    } else {
+      setMessage('You won! '+dialogue.lose[Math.floor(Math.random()*dialogue.lose.length)]);
+    }
+  } else {
+    setMessage('Draw! Good game.');
+  }
+}
+
+/* ==================================
+   CONTROLS
+================================== */
+
 document.getElementById('undo').onclick=()=>{
-  if(history.length)restore(history.pop());
+  if(!game||!game.history().length)return;
+
+  game.undo();
+
+  if(mode==='bot'&&game.turn()==='b'&&game.history().length) {
+    game.undo();
+  }
+
+  selectedSquare=null;
+  botThinking=false;
+  clearTimeout(botTimer);
+  renderGame();
 };
 
 document.getElementById('flip').onclick=()=>{
   flipped=!flipped;
-  render();
+  renderGame();
 };
 
-document.getElementById('restart').onclick=initialState;
-document.getElementById('newgame').onclick=initialState;
+document.getElementById('restart').onclick=()=>{
+  if(!game)return;
+  startGame();
+};
 
-initialState();
+/* ==================================
+   ONLINE MESSAGE
+================================== */
+
+function onlineUnavailable() {
+  const toast=document.getElementById('toast');
+
+  toast.textContent='Online is currently unavailable! Come back soon...';
+  toast.classList.add('show');
+
+  clearTimeout(toastTimer);
+
+  toastTimer=setTimeout(()=>{
+    toast.classList.remove('show');
+  },3500);
+}
+
 </script>
 </body>
 </html>
