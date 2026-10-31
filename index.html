@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1060,40 +1059,19 @@ function goBack() {
 
 /* =====================================
    PROFILE IMAGE LOADING
+   Files live in Resources/bots/profiles/ and are named like:
+   Zach.png, June.png, MagnusCarlsen.png, JaylenBrown.png
 ===================================== */
 
-function profileImage(name) {
-  return 'Resources/bots/profiles/'+name.toLowerCase().replace(/\s+/g,'-');
-}
-
 function loadProfile(img,name,fallback) {
-  const base=profileImage(name);
-
-  const paths=[
-    base+'.png',
-    base+'.jpg',
-    base+'.jpeg',
-    base+'.webp',
-    base+'.svg',
-    'Resources/bots/profiles/'+name+'.png',
-    'Resources/bots/profiles/'+name+'.jpg',
-    'Resources/bots/profiles/'+name+'.webp'
-  ];
-
-  let index=0;
+  const file=name.replace(/\s+/g,'');   // "Magnus Carlsen" -> "MagnusCarlsen"
 
   img.onerror=()=>{
-    index++;
-
-    if(index<paths.length) {
-      img.src=paths[index];
-    } else {
-      img.style.display='none';
-      fallback.style.display='grid';
-    }
+    img.style.display='none';
+    fallback.style.display='grid';
   };
 
-  img.src=paths[0];
+  img.src='Resources/bots/profiles/'+file+'.png';
 }
 
 /* =====================================
@@ -1225,6 +1203,7 @@ function startBotGame() {
   loadProfile(img,bot.name,fallback);
   avatar.append(img,fallback);
 
+  showScreen('game');
   startGame();
 }
 
@@ -1235,6 +1214,7 @@ function startPractice() {
   document.getElementById('blackElo').textContent='';
   document.getElementById('blackAvatar').textContent='♟';
 
+  showScreen('game');
   startGame();
 }
 
@@ -1451,7 +1431,7 @@ function clickSquare(square) {
 
 function makePlayerMove(move) {
   try {
-    game.move({...move,promotion:'q'});
+    game.move({promotion:'q',...move});
   } catch(e) {
     return;
   }
