@@ -1630,95 +1630,260 @@ function setMessage(text) {
 
 /* =====================================
    BOT BRAIN
+   A real alpha-beta search. Elo controls how deep it looks,
+   how long it thinks, and how often it plays a weaker move.
 ===================================== */
 
-const pieceValues={
-  p:100,
-  n:310,
-  b:330,
-  r:500,
-  q:900,
-  k:20000
+const pieceValues={p:100,n:320,b:330,r:500,q:900,k:0};
+const MATE=100000;
+const TIMEOUT={timeout:true};
+
+let searchNodes=0;
+let searchDeadline=0;
+
+// Piece-square tables, written from White's side (rank 8 first).
+const PST={
+  p:[0,0,0,0,0,0,0,0,
+     50,50,50,50,50,50,50,50,
+     10,10,20,30,30,20,10,10,
+     5,5,10,25,25,10,5,5,
+     0,0,0,20,20,0,0,0,
+     5,-5,-10,0,0,-10,-5,5,
+     5,10,10,-20,-20,10,10,5,
+     0,0,0,0,0,0,0,0],
+  n:[-50,-40,-30,-30,-30,-30,-40,-50,
+     -40,-20,0,0,0,0,-20,-40,
+     -30,0,10,15,15,10,0,-30,
+     -30,5,15,20,20,15,5,-30,
+     -30,0,15,20,20,15,0,-30,
+     -30,5,10,15,15,10,5,-30,
+     -40,-20,0,5,5,0,-20,-40,
+     -50,-40,-30,-30,-30,-30,-40,-50],
+  b:[-20,-10,-10,-10,-10,-10,-10,-20,
+     -10,0,0,0,0,0,0,-10,
+     -10,0,5,10,10,5,0,-10,
+     -10,5,5,10,10,5,5,-10,
+     -10,0,10,10,10,10,0,-10,
+     -10,10,10,10,10,10,10,-10,
+     -10,5,0,0,0,0,5,-10,
+     -20,-10,-10,-10,-10,-10,-10,-20],
+  r:[0,0,0,0,0,0,0,0,
+     5,10,10,10,10,10,10,5,
+     -5,0,0,0,0,0,0,-5,
+     -5,0,0,0,0,0,0,-5,
+     -5,0,0,0,0,0,0,-5,
+     -5,0,0,0,0,0,0,-5,
+     -5,0,0,0,0,0,0,-5,
+     0,0,0,5,5,0,0,0],
+  q:[-20,-10,-10,-5,-5,-10,-10,-20,
+     -10,0,0,0,0,0,0,-10,
+     -10,0,5,5,5,5,0,-10,
+     -5,0,5,5,5,5,0,-5,
+     0,0,5,5,5,5,0,-5,
+     -10,5,5,5,5,5,0,-10,
+     -10,0,5,0,0,0,0,-10,
+     -20,-10,-10,-5,-5,-10,-10,-20],
+  k:[-30,-40,-40,-50,-50,-40,-40,-30,
+     -30,-40,-40,-50,-50,-40,-40,-30,
+     -30,-40,-40,-50,-50,-40,-40,-30,
+     -30,-40,-40,-50,-50,-40,-40,-30,
+     -20,-30,-30,-40,-40,-30,-30,-20,
+     -10,-20,-20,-20,-20,-20,-20,-10,
+     20,20,0,0,0,0,20,20,
+     20,30,10,0,0,10,30,20]
 };
 
-function evaluateMove(move) {
+// Score of the current position for the side to move (centipawns).
+function staticEval() {
+  const board=game.board();
   let score=0;
 
-  const piece=game.get(move.from);
-  const captured=game.get(move.to);
+  for(let r=0;r<8;r++) {
+    for(let c=0;c<8;c++) {
+      const p=board[r][c];
+      if(!p)continue;
 
-  if(captured) {
-    score+=pieceValues[captured.type]*0.9;
+      const index=p.color==='w'?r*8+c:(7-r)*8+c;
+      const value=pieceValues[p.type]+PST[p.type][index];
+
+      score+=p.color==='w'?value:-value;
+    }
   }
 
-  if(move.flags.includes('p'))score+=850;
-
-  if(move.san.includes('+'))score+=45;
-  if(move.san.includes('#'))score+=50000;
-
-  const col='abcdefgh'.indexOf(move.to[0]);
-  const row=Number(move.to[1])-1;
-  const centerDistance=Math.abs(3.5-col)+Math.abs(3.5-row);
-
-  score+=(7-centerDistance)*3;
-
-  if(piece.type==='n'||piece.type==='b') {
-    const homeRank=game.turn()==='b'?8:1;
-    if(Number(move.from[1])===homeRank)score+=10;
-  }
-
-  if(move.san==='O-O'||move.san==='O-O-O')score+=35;
-
-  return score;
+  return game.turn()==='w'?score:-score;
 }
 
-function botMistakeChance(bot) {
-  if(bot.elo<=150)return .85;
-  if(bot.elo<=250)return .78;
-  if(bot.elo<=400)return .69;
-  if(bot.elo<=700)return .56;
-  if(bot.elo<=1000)return .43;
-  if(bot.elo<=1300)return .32;
-  if(bot.elo<=1500)return .25;
-  if(bot.elo<=2000)return .17;
-  return .09;
+function orderMoves(moves) {
+  for(const m of moves) {
+    let s=0;
+
+    if(m.captured)s+=10*pieceValues[m.captured]-pieceValues[m.piece]/10;
+    if(m.promotion)s+=pieceValues[m.promotion];
+    if(m.san.indexOf('+')>-1)s+=30;
+
+    m.order=s;
+  }
+
+  moves.sort((a,b)=>b.order-a.order);
+}
+
+function checkTime() {
+  if((++searchNodes&255)===0&&Date.now()>searchDeadline)throw TIMEOUT;
+}
+
+// Only look at captures/promotions so the search doesn't stop mid-trade.
+function quiesce(alpha,beta,qdepth) {
+  checkTime();
+
+  const stand=staticEval();
+
+  if(qdepth>=6)return stand;
+  if(stand>=beta)return stand;
+  if(stand>alpha)alpha=stand;
+
+  const moves=game.moves({verbose:true})
+    .filter(m=>m.captured||m.promotion);
+
+  orderMoves(moves);
+
+  for(const m of moves) {
+    game.move({from:m.from,to:m.to,promotion:m.promotion});
+
+    let score;
+    try {
+      score=-quiesce(-beta,-alpha,qdepth+1);
+    } finally {
+      game.undo();
+    }
+
+    if(score>=beta)return score;
+    if(score>alpha)alpha=score;
+  }
+
+  return alpha;
+}
+
+function negamax(depth,alpha,beta,ply,useQuiesce) {
+  checkTime();
+
+  if(depth<=0) {
+    return useQuiesce?quiesce(alpha,beta,0):staticEval();
+  }
+
+  const moves=game.moves({verbose:true});
+
+  if(!moves.length) {
+    return game.in_check()?-(MATE-ply):0;
+  }
+
+  orderMoves(moves);
+
+  let best=-Infinity;
+
+  for(const m of moves) {
+    game.move({from:m.from,to:m.to,promotion:m.promotion});
+
+    let score;
+    try {
+      score=-negamax(depth-1,-beta,-alpha,ply+1,useQuiesce);
+    } finally {
+      game.undo();
+    }
+
+    if(score>best)best=score;
+    if(best>alpha)alpha=best;
+    if(alpha>=beta)break;
+  }
+
+  return best;
+}
+
+// How strong each bot plays:
+//   depth    - how many moves ahead it looks
+//   quiesce  - whether it sees trades through to the end
+//   noise    - random error added to each move's score (centipawns)
+//   random   - chance it just plays a random legal move
+//   time     - thinking time limit in ms
+function botParams(elo) {
+  if(elo<=150)  return {depth:1,quiesce:false,noise:180,random:.35,time:300};
+  if(elo<=250)  return {depth:1,quiesce:false,noise:120,random:.20,time:300};
+  if(elo<=400)  return {depth:1,quiesce:false,noise:70, random:.10,time:400};
+  if(elo<=700)  return {depth:2,quiesce:false,noise:50, random:.05,time:800};
+  if(elo<=1000) return {depth:2,quiesce:true, noise:30, random:.02,time:1000};
+  if(elo<=1300) return {depth:3,quiesce:true, noise:18, random:.01,time:1500};
+  if(elo<=1500) return {depth:3,quiesce:true, noise:8,  random:0,  time:2000};
+  if(elo<=2000) return {depth:4,quiesce:true, noise:0,  random:0,  time:2500};
+  return            {depth:6,quiesce:true, noise:0,  random:0,  time:2500};
 }
 
 function chooseBotMove() {
-  const moves=game.moves({verbose:true});
+  let moves=game.moves({verbose:true});
 
   if(!moves.length)return null;
 
   const bot=bots[selectedBot];
-  const mistakeChance=botMistakeChance(bot);
+  const p=botParams(bot.elo);
 
-  const evaluated=moves.map(move=>({
-    move,
-    score:evaluateMove(move)+Math.random()*15
-  }));
-
-  evaluated.sort((a,b)=>b.score-a.score);
-
-  if(Math.random()<mistakeChance) {
-    const lowerMoves=evaluated.slice(
-      Math.max(0,Math.floor(evaluated.length*.3))
-    );
-
-    return lowerMoves[
-      Math.floor(Math.random()*lowerMoves.length)
-    ].move;
+  if(Math.random()<p.random) {
+    return moves[Math.floor(Math.random()*moves.length)];
   }
 
-  const count=bot.elo<=400?5:
-    bot.elo<=700?4:
-    bot.elo<=1300?3:
-    bot.elo<=2000?2:2;
+  orderMoves(moves);
 
-  const candidates=evaluated.slice(0,count);
+  searchNodes=0;
+  searchDeadline=Date.now()+p.time;
 
-  return candidates[
-    Math.floor(Math.random()*candidates.length)
-  ].move;
+  let completed=null;
+
+  // Iterative deepening: keep the last depth that finished in time.
+  for(let depth=1;depth<=p.depth;depth++) {
+    const scored=[];
+    let bestScore=-Infinity;
+
+    try {
+      for(const m of moves) {
+        game.move({from:m.from,to:m.to,promotion:m.promotion});
+
+        let score;
+        try {
+          score=p.noise>0
+            ?-negamax(depth-1,-Infinity,Infinity,1,p.quiesce)
+            :-negamax(depth-1,-Infinity,-bestScore,1,p.quiesce);
+        } finally {
+          game.undo();
+        }
+
+        scored.push({move:m,score});
+        if(score>bestScore)bestScore=score;
+      }
+    } catch(e) {
+      if(e!==TIMEOUT)throw e;
+      break;
+    }
+
+    scored.sort((a,b)=>b.score-a.score);
+    completed=scored;
+    moves=scored.map(x=>x.move);
+
+    if(bestScore>MATE-100)break;   // found a forced mate
+  }
+
+  if(!completed)return moves[0];
+
+  let best=null;
+  let bestValue=-Infinity;
+
+  for(const s of completed) {
+    const jitter=p.noise?(Math.random()*2-1)*p.noise:0;
+    const value=s.score+jitter;
+
+    if(value>bestValue) {
+      bestValue=value;
+      best=s.move;
+    }
+  }
+
+  return best;
 }
 
 function scheduleBot() {
@@ -1765,7 +1930,7 @@ function scheduleBot() {
       randomLine(move.captured?'capture':'thinking');
     }
 
-  },850+Math.random()*1100);
+  },350+Math.random()*500);
 }
 
 /* =====================================
